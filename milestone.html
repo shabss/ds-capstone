@@ -214,7 +214,12 @@ hr {
 <p>The data was obtained from the link <a href="https://d396qusza40orc.cloudfront.net/dsscapstone/dataset/Coursera-SwiftKey.zip">https://d396qusza40orc.cloudfront.net/dsscapstone/dataset/Coursera-SwiftKey.zip</a>, which provide by course instructures. The zip contains copora of blogs, news and twitter in 4 languages English, Dutch, French and Russian. The statistics of the combined corpous is as follows: </p>
 
 <pre><code class="r">source(&quot;milestone.R&quot;)
-if (!exists(&quot;ds.linecount&quot;)) ds.linecount &lt;- get_dataset_lines(&quot;Coursera-SwiftKey/final&quot;)
+</code></pre>
+
+<pre><code>## Loading required package: NLP
+</code></pre>
+
+<pre><code class="r">if (!exists(&quot;ds.linecount&quot;)) ds.linecount &lt;- get_dataset_lines(&quot;Coursera-SwiftKey/final&quot;)
 if (!exists(&quot;ds.wordcount&quot;)) ds.wordcount &lt;- get_dataset_words(&quot;Coursera-SwiftKey/final&quot;)
 stat &lt;- merge(ds.wordcount, ds.linecount)
 stat$file &lt;- gsub(&quot;Coursera-Swiftkey/final/.*/(..)_..(.*).txt&quot;, &quot;\\1\\2&quot;,

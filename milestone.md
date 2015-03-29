@@ -17,6 +17,13 @@ The data was obtained from the link https://d396qusza40orc.cloudfront.net/dsscap
 
 ```r
 source("milestone.R")
+```
+
+```
+## Loading required package: NLP
+```
+
+```r
 if (!exists("ds.linecount")) ds.linecount <- get_dataset_lines("Coursera-SwiftKey/final")
 if (!exists("ds.wordcount")) ds.wordcount <- get_dataset_words("Coursera-SwiftKey/final")
 stat <- merge(ds.wordcount, ds.linecount)
