@@ -1,0 +1,110 @@
+---
+title: "Data Science Captsone Milestone Report"
+author: "Shabbir Suterwala"
+date: "Sunday, March 29, 2015"
+output: html_document
+---
+
+# Data Science Captsone Milestone Report
+**Shabbir Suterwala**
+
+## Executive Summary
+The purpose of this report is to establish an understanding of basic tasks required for data processing of a text corpus. English Blogs, News and Twitter corpora are analyised for word, line and unique word counts. Further more top 1gram, 2grams and 3grams are presented. 
+
+## Data Analysis Level 1
+The data was obtained from the link https://d396qusza40orc.cloudfront.net/dsscapstone/dataset/Coursera-SwiftKey.zip, which provide by course instructures. The zip contains copora of blogs, news and twitter in 4 languages English, Dutch, French and Russian. The statistics of the combined corpous is as follows: 
+
+```{r}
+source("milestone.R")
+if (!exists("ds.linecount")) ds.linecount <- get_dataset_lines("Coursera-SwiftKey/final")
+if (!exists("ds.wordcount")) ds.wordcount <- get_dataset_words("Coursera-SwiftKey/final")
+stat <- merge(ds.wordcount, ds.linecount)
+stat$file <- gsub("Coursera-Swiftkey/final/.*/(..)_..(.*).txt", "\\1\\2",
+                  as.character(stat$file), perl=TRUE, ignore.case=TRUE)
+stat
+
+
+```
+
+## Data Preparation
+
+We will primarily work with English dataset. Working with full English dataset took long time for the desktop computer. So we decided to break the data into a smaller set for this report: 
+
+```{r echo=FALSE}
+data.frame(Type=c("Training %", "CV %", "Test %"), Project=c(60,20,20), Report=c(5, NA, NA))
+```
+
+Thus the English training data for this report looks as follows:
+```{r}
+
+#prepare training,cv,test data into data.05 folder. 
+#0.5% training data extraction is currently hardcoded
+ds <- get_dataset("data.05")
+if (!exists("ds.linecount.report")) ds.linecount.report <- get_dataset_lines("data.05")
+if (!exists("ds.wordcount.report")) ds.wordcount.report <- get_dataset_words("data.05")
+stat <- merge(ds.wordcount.report, ds.wordcount.report)
+stat$file <- gsub("data.05/.*/(..)_..(.*).txt.(.*)", "\\1\\2 \\3",
+                  as.character(stat$file), perl=TRUE, ignore.case=TRUE)
+stat <- stat[grep("^en", stat$file),]
+stat
+```
+
+## Data Analysis
+
+The 1-gram, 2-gram and 3-gram for Blogs, Twitter and News are as follows:
+```{r echo=FALSE}
+if (!exists("en.blogs.1grams")) en.blogs.1grams <- make_ngram_table("data.05/en_US/en_US.blogs.txt.train", 1)
+if (!exists("en.blogs.2grams")) en.blogs.2grams <- make_ngram_table("data.05/en_US/en_US.blogs.txt.train", 2)
+if (!exists("en.blogs.3grams")) en.blogs.3grams <- make_ngram_table("data.05/en_US/en_US.blogs.txt.train", 3)
+
+if (!exists("en.twitter.1grams")) en.twitter.1grams <- make_ngram_table("data.05/en_US/en_US.twitter.txt.train", 1)
+if (!exists("en.twitter.2grams")) en.twitter.2grams <- make_ngram_table("data.05/en_US/en_US.twitter.txt.train", 2)
+if (!exists("en.twitter.3grams")) en.twitter.3grams <- make_ngram_table("data.05/en_US/en_US.twitter.txt.train", 3)
+
+if (!exists("en.news.1grams")) en.news.1grams <- make_ngram_table("data.05/en_US/en_US.news.txt.train", 1)
+if (!exists("en.news.2grams")) en.news.2grams <- make_ngram_table("data.05/en_US/en_US.news.txt.train", 2)
+if (!exists("en.news.3grams")) en.news.3grams <- make_ngram_table("data.05/en_US/en_US.news.txt.train", 3)
+
+freq.en.blogs.1grams <- freq_ngrams(en.blogs.1grams, 25, "Most Frequent EN Blogs 1-Grams")
+freq.en.blogs.2grams <- freq_ngrams(en.blogs.2grams, 25, "Most Frequent EN Blogs 2-Grams")
+freq.en.blogs.1grams <- freq_ngrams(en.blogs.3grams, 25, "Most Frequent EN Blogs 3-Grams")
+
+freq.en.twitter.1grams <- freq_ngrams(en.twitter.1grams, 25, "Most Frequent EN Twitter 1-Grams")
+freq.en.twitter.2grams <- freq_ngrams(en.twitter.2grams, 25, "Most Frequent EN Twitter 2-Grams")
+freq.en.twitter.3grams <- freq_ngrams(en.twitter.3grams, 25, "Most Frequent EN Twitter 3-Grams")
+
+freq.en.news.1grams <- freq_ngrams(en.news.1grams, 25, "Most Frequent EN News 1-Grams")
+freq.en.news.2grams <- freq_ngrams(en.news.2grams, 25, "Most Frequent EN News 2-Grams")
+freq.en.news.3grams <- freq_ngrams(en.news.3grams, 25, "Most Frequent EN News 3-Grams")
+
+freq.en.blogs.1grams; freq.en.blogs.2grams; freq.en.blogs.1grams
+freq.en.twitter.1grams; freq.en.twitter.2grams; freq.en.twitter.3grams
+freq.en.news.1grams; freq.en.news.2grams; freq.en.news.3grams
+```
+
+
+## Modeling Strategy
+
+To buld the prediction model following tasks has to be further performed
+
+   1. Use porter stemming to improve N-gram frequencies. This will help reduce data footprint of the model
+   2. Use PCFG to understand the sentense structure. This will help with predicting the right POS
+   3. Once probable words are found with combining porter stemming and PCFG, Use backoff strategy to predict probability of a given word.
+   
+## Logistic Strategy
+
+Given the resource requirements for the tm package we will break the training data into multiple pieces and distribute this on multiple machines. Too keep things simple file system will be used as data sharing mechanism. 
+
+   1. Training dataset will equally split into 10 parts. This can easily be done with Linux/Unix utilities.
+   2. A total of 4 computers will be used to perform the tasks. Each computer will read the training set from folder that is shared and write the data to the shared folder. Tasks are:
+      1. Creating Document Term Matrix for training part N
+      2. Creating a merged model from individual models
+   3. One master computer will issue the tasks. The master will will also execute tasks.
+
+To reduce the data foot print other NLP smooting methods besides backoff smooting will be analzed and best will be picked
+   
+# Conclusion
+English Blogs, News and Twitter corpora are analyised for word, line and unique word counts and corresponding 1gram, 2grams and 3grams are presented. Additionally, strategies for building a machine learning model to predict the next word is provided.
+
+# References
+1. http://nlp.stanford.edu/~wcmac/papers/20050421-smoothing-tutorial.pdf
