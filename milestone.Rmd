@@ -67,7 +67,7 @@ if (!exists("en.news.3grams")) en.news.3grams <- make_ngram_table("data.05/en_US
 
 freq.en.blogs.1grams <- freq_ngrams(en.blogs.1grams, 25, "Most Frequent EN Blogs 1-Grams")
 freq.en.blogs.2grams <- freq_ngrams(en.blogs.2grams, 25, "Most Frequent EN Blogs 2-Grams")
-freq.en.blogs.1grams <- freq_ngrams(en.blogs.3grams, 25, "Most Frequent EN Blogs 3-Grams")
+freq.en.blogs.3grams <- freq_ngrams(en.blogs.3grams, 25, "Most Frequent EN Blogs 3-Grams")
 
 freq.en.twitter.1grams <- freq_ngrams(en.twitter.1grams, 25, "Most Frequent EN Twitter 1-Grams")
 freq.en.twitter.2grams <- freq_ngrams(en.twitter.2grams, 25, "Most Frequent EN Twitter 2-Grams")
@@ -77,9 +77,9 @@ freq.en.news.1grams <- freq_ngrams(en.news.1grams, 25, "Most Frequent EN News 1-
 freq.en.news.2grams <- freq_ngrams(en.news.2grams, 25, "Most Frequent EN News 2-Grams")
 freq.en.news.3grams <- freq_ngrams(en.news.3grams, 25, "Most Frequent EN News 3-Grams")
 
-freq.en.blogs.1grams; freq.en.blogs.2grams; freq.en.blogs.1grams
-freq.en.twitter.1grams; freq.en.twitter.2grams; freq.en.twitter.3grams
-freq.en.news.1grams; freq.en.news.2grams; freq.en.news.3grams
+#freq.en.blogs.1grams; freq.en.blogs.2grams; freq.en.blogs.3grams
+#freq.en.twitter.1grams; freq.en.twitter.2grams; freq.en.twitter.3grams
+#freq.en.news.1grams; freq.en.news.2grams; freq.en.news.3grams
 ```
 
 

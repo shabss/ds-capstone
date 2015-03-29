@@ -246,6 +246,7 @@ freq_ngrams <- function(tdm, limit, title) {
     }
     #f <- list(freq=freq, plot = bp);
     bp
+    freq
 }
 
 
