@@ -1,1 +1,1 @@
-@cat %1 | tr 'A-Z' 'a-z'| tr -sc 'A-za-z' '\n'| uniq | wc -l
+@cat %1 | tr 'A-Z' 'a-z'| tr -sc 'A-Za-z' '\n'| sort | uniq | wc -l

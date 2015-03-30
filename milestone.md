@@ -12,79 +12,61 @@ output: html_document
 The purpose of this report is to establish an understanding of basic tasks required for data processing of a text corpus. English Blogs, News and Twitter corpora are analyised for word, line and unique word counts. Further more top 1gram, 2grams and 3grams are presented. 
 
 ## Data Analysis Level 1
-The data was obtained from the link https://d396qusza40orc.cloudfront.net/dsscapstone/dataset/Coursera-SwiftKey.zip, which provide by course instructures. The zip contains copora of blogs, news and twitter in 4 languages English, Dutch, French and Russian. The statistics of the combined corpous is as follows: 
+The data was obtained from the link https://d396qusza40orc.cloudfront.net/dsscapstone/dataset/Coursera-SwiftKey.zip, which is provided by the course instructures. The zip contains copora of blogs, news and twitter in 4 languages English, Dutch, French and Russian. The statistics of the combined corpous is as follows: 
 
 
-```r
-source("milestone.R")
-if (!exists("ds.linecount")) ds.linecount <- get_dataset_lines("Coursera-SwiftKey/final")
-if (!exists("ds.wordcount")) ds.wordcount <- get_dataset_words("Coursera-SwiftKey/final")
-stat <- merge(ds.wordcount, ds.linecount)
-stat$file <- gsub("Coursera-Swiftkey/final/.*/(..)_..(.*).txt", "\\1\\2",
-                  as.character(stat$file), perl=TRUE, ignore.case=TRUE)
-stat
-```
-
-```
-##          file     words   unique   lines
-## 1    de.blogs  85459666 13490044  371440
-## 2     de.news  95591959 14281896  244743
-## 3  de.twitter  75578341 12271007  947774
-## 4    en.blogs 210160014 37844572  899288
-## 5     en.news 205811889 34600499 1010242
-## 6  en.twitter 167105338 30506876 2360148
-## 7    fi.blogs 108503595 15008275  439785
-## 8     fi.news  94234350 12304795  485758
-## 9  fi.twitter  25331142  3626100  285214
-## 10   ru.blogs 116855835    81704  337100
-## 11    ru.news 118996424    48450  196360
-## 12 ru.twitter 105182346   144232  881414
-```
+<!-- html table generated in R 3.1.3 by xtable 1.7-4 package -->
+<!-- Sun Mar 29 20:44:46 2015 -->
+<table border=1>
+<tr> <th>  </th> <th> File </th> <th> Lines (mil) </th> <th> Words (mil) </th> <th> Unique (mil) </th> <th> % Unique </th> <th> Bytes (MB) </th>  </tr>
+  <tr> <td align="right"> 1 </td> <td> de.blogs </td> <td align="right"> 0.37 </td> <td align="right"> 12.61 </td> <td align="right"> 0.39 </td> <td align="right"> 3.06 </td> <td align="right"> 85.46 </td> </tr>
+  <tr> <td align="right"> 2 </td> <td> de.news </td> <td align="right"> 0.24 </td> <td align="right"> 13.20 </td> <td align="right"> 0.38 </td> <td align="right"> 2.88 </td> <td align="right"> 95.59 </td> </tr>
+  <tr> <td align="right"> 3 </td> <td> de.twitter </td> <td align="right"> 0.95 </td> <td align="right"> 11.79 </td> <td align="right"> 0.32 </td> <td align="right"> 2.75 </td> <td align="right"> 75.58 </td> </tr>
+  <tr> <td align="right"> 4 </td> <td> en.blogs </td> <td align="right"> 0.90 </td> <td align="right"> 37.27 </td> <td align="right"> 0.25 </td> <td align="right"> 0.68 </td> <td align="right"> 210.16 </td> </tr>
+  <tr> <td align="right"> 5 </td> <td> en.news </td> <td align="right"> 1.01 </td> <td align="right"> 34.31 </td> <td align="right"> 0.21 </td> <td align="right"> 0.62 </td> <td align="right"> 205.81 </td> </tr>
+  <tr> <td align="right"> 6 </td> <td> en.twitter </td> <td align="right"> 2.36 </td> <td align="right"> 30.34 </td> <td align="right"> 0.30 </td> <td align="right"> 1.00 </td> <td align="right"> 167.11 </td> </tr>
+  <tr> <td align="right"> 7 </td> <td> fi.blogs </td> <td align="right"> 0.44 </td> <td align="right"> 12.71 </td> <td align="right"> 0.87 </td> <td align="right"> 6.81 </td> <td align="right"> 108.50 </td> </tr>
+  <tr> <td align="right"> 8 </td> <td> fi.news </td> <td align="right"> 0.49 </td> <td align="right"> 10.41 </td> <td align="right"> 0.68 </td> <td align="right"> 6.54 </td> <td align="right"> 94.23 </td> </tr>
+  <tr> <td align="right"> 9 </td> <td> fi.twitter </td> <td align="right"> 0.29 </td> <td align="right"> 3.15 </td> <td align="right"> 0.30 </td> <td align="right"> 9.49 </td> <td align="right"> 25.33 </td> </tr>
+  <tr> <td align="right"> 10 </td> <td> ru.blogs </td> <td align="right"> 0.34 </td> <td align="right"> 2.04 </td> <td align="right"> 0.02 </td> <td align="right"> 0.99 </td> <td align="right"> 116.86 </td> </tr>
+  <tr> <td align="right"> 11 </td> <td> ru.news </td> <td align="right"> 0.20 </td> <td align="right"> 1.80 </td> <td align="right"> 0.01 </td> <td align="right"> 0.54 </td> <td align="right"> 119.00 </td> </tr>
+  <tr> <td align="right"> 12 </td> <td> ru.twitter </td> <td align="right"> 0.88 </td> <td align="right"> 2.42 </td> <td align="right"> 0.02 </td> <td align="right"> 0.91 </td> <td align="right"> 105.18 </td> </tr>
+   </table>
 
 ## Data Preparation
 
 We will primarily work with English dataset. Working with full English dataset took long time for the desktop computer. So we decided to break the data into a smaller set for this report: 
 
-
-```
-##         Type Project Report
-## 1 Training %      60      5
-## 2       CV %      20     NA
-## 3     Test %      20     NA
-```
+<!-- html table generated in R 3.1.3 by xtable 1.7-4 package -->
+<!-- Sun Mar 29 20:44:46 2015 -->
+<table border=1>
+<tr> <th>  </th> <th> Type </th> <th> Project </th> <th> Report </th>  </tr>
+  <tr> <td align="right"> 1 </td> <td> Training % </td> <td align="right"> 60.00 </td> <td align="right"> 5.00 </td> </tr>
+  <tr> <td align="right"> 2 </td> <td> CV % </td> <td align="right"> 20.00 </td> <td align="right">  </td> </tr>
+  <tr> <td align="right"> 3 </td> <td> Test % </td> <td align="right"> 20.00 </td> <td align="right">  </td> </tr>
+   </table>
 
 Thus the English training data for this report looks as follows:
 
-```r
-#prepare training,cv,test data into data.05 folder. 
-#0.5% training data extraction is currently hardcoded
-ds <- get_dataset("data.05")
-if (!exists("ds.linecount.report")) ds.linecount.report <- get_dataset_lines("data.05")
-if (!exists("ds.wordcount.report")) ds.wordcount.report <- get_dataset_words("data.05")
-stat <- merge(ds.wordcount.report, ds.wordcount.report)
-stat$file <- gsub("data.05/.*/(..)_..(.*).txt.(.*)", "\\1\\2 \\3",
-                  as.character(stat$file), perl=TRUE, ignore.case=TRUE)
-stat <- stat[grep("^en", stat$file),]
-stat
-```
-
-```
-##                file    words   unique
-## 10      en.blogs cv 99614866 18011944
-## 11    en.blogs test 99228613 17950281
-## 12   en.blogs train 10417247  1882363
-## 13       en.news cv 97504067 16473302
-## 14     en.news test 97092923 16403108
-## 15    en.news train 10204657  1724087
-## 16    en.twitter cv 78140493 14470210
-## 17  en.twitter test 78312684 14500597
-## 18 en.twitter train  8292013  1536001
-```
+<!-- html table generated in R 3.1.3 by xtable 1.7-4 package -->
+<!-- Sun Mar 29 20:44:46 2015 -->
+<table border=1>
+<tr> <th>  </th> <th> File </th> <th> Lines (mil) </th> <th> Words (mil) </th> <th> Unique (mil) </th> <th> % Unique </th> <th> Bytes (MB) </th>  </tr>
+  <tr> <td align="right"> 1 </td> <td> en.blogs cv </td> <td align="right"> 0.43 </td> <td align="right"> 17.74 </td> <td align="right"> 0.18 </td> <td align="right"> 1.00 </td> <td align="right"> 99.61 </td> </tr>
+  <tr> <td align="right"> 2 </td> <td> en.blogs test </td> <td align="right"> 0.43 </td> <td align="right"> 17.68 </td> <td align="right"> 0.18 </td> <td align="right"> 1.00 </td> <td align="right"> 99.23 </td> </tr>
+  <tr> <td align="right"> 3 </td> <td> en.blogs train </td> <td align="right"> 0.04 </td> <td align="right"> 1.85 </td> <td align="right"> 0.06 </td> <td align="right"> 3.26 </td> <td align="right"> 10.42 </td> </tr>
+  <tr> <td align="right"> 4 </td> <td> en.news cv </td> <td align="right"> 0.48 </td> <td align="right"> 16.34 </td> <td align="right"> 0.16 </td> <td align="right"> 0.96 </td> <td align="right"> 97.50 </td> </tr>
+  <tr> <td align="right"> 5 </td> <td> en.news test </td> <td align="right"> 0.48 </td> <td align="right"> 16.26 </td> <td align="right"> 0.16 </td> <td align="right"> 0.96 </td> <td align="right"> 97.09 </td> </tr>
+  <tr> <td align="right"> 6 </td> <td> en.news train </td> <td align="right"> 0.05 </td> <td align="right"> 1.71 </td> <td align="right"> 0.06 </td> <td align="right"> 3.49 </td> <td align="right"> 10.20 </td> </tr>
+  <tr> <td align="right"> 7 </td> <td> en.twitter cv </td> <td align="right"> 1.12 </td> <td align="right"> 14.39 </td> <td align="right"> 0.20 </td> <td align="right"> 1.38 </td> <td align="right"> 78.14 </td> </tr>
+  <tr> <td align="right"> 8 </td> <td> en.twitter test </td> <td align="right"> 1.12 </td> <td align="right"> 14.42 </td> <td align="right"> 0.20 </td> <td align="right"> 1.38 </td> <td align="right"> 78.31 </td> </tr>
+  <tr> <td align="right"> 9 </td> <td> en.twitter train </td> <td align="right"> 0.12 </td> <td align="right"> 1.53 </td> <td align="right"> 0.06 </td> <td align="right"> 3.79 </td> <td align="right"> 8.29 </td> </tr>
+   </table>
 
 ## Data Analysis
 
 The 1-gram, 2-gram and 3-gram for Blogs, Twitter and News are as follows:
-![plot of chunk unnamed-chunk-4](figure/unnamed-chunk-4-1.png) ![plot of chunk unnamed-chunk-4](figure/unnamed-chunk-4-2.png) ![plot of chunk unnamed-chunk-4](figure/unnamed-chunk-4-3.png) ![plot of chunk unnamed-chunk-4](figure/unnamed-chunk-4-4.png) ![plot of chunk unnamed-chunk-4](figure/unnamed-chunk-4-5.png) ![plot of chunk unnamed-chunk-4](figure/unnamed-chunk-4-6.png) ![plot of chunk unnamed-chunk-4](figure/unnamed-chunk-4-7.png) ![plot of chunk unnamed-chunk-4](figure/unnamed-chunk-4-8.png) ![plot of chunk unnamed-chunk-4](figure/unnamed-chunk-4-9.png) 
+![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-1.png) ![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-2.png) ![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-3.png) ![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-4.png) ![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-5.png) ![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-6.png) ![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-7.png) ![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-8.png) ![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-9.png) 
 
 
 ## Modeling Strategy

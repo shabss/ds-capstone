@@ -12,41 +12,55 @@ output: html_document
 The purpose of this report is to establish an understanding of basic tasks required for data processing of a text corpus. English Blogs, News and Twitter corpora are analyised for word, line and unique word counts. Further more top 1gram, 2grams and 3grams are presented. 
 
 ## Data Analysis Level 1
-The data was obtained from the link https://d396qusza40orc.cloudfront.net/dsscapstone/dataset/Coursera-SwiftKey.zip, which provide by course instructures. The zip contains copora of blogs, news and twitter in 4 languages English, Dutch, French and Russian. The statistics of the combined corpous is as follows: 
+The data was obtained from the link https://d396qusza40orc.cloudfront.net/dsscapstone/dataset/Coursera-SwiftKey.zip, which is provided by the course instructures. The zip contains copora of blogs, news and twitter in 4 languages English, Dutch, French and Russian. The statistics of the combined corpous is as follows: 
 
-```{r}
+```{r echo=FALSE}
 source("milestone.R")
-if (!exists("ds.linecount")) ds.linecount <- get_dataset_lines("Coursera-SwiftKey/final")
-if (!exists("ds.wordcount")) ds.wordcount <- get_dataset_words("Coursera-SwiftKey/final")
-stat <- merge(ds.wordcount, ds.linecount)
-stat$file <- gsub("Coursera-Swiftkey/final/.*/(..)_..(.*).txt", "\\1\\2",
-                  as.character(stat$file), perl=TRUE, ignore.case=TRUE)
-stat
-
-
+library(xtable)
+if (!exists("ds.stat")) {
+    ds.stat <- get_dataset_stats("Coursera-SwiftKey/final")
+    ds.stat$file <- gsub("Coursera-Swiftkey/final/.*/(..)_..(.*).txt", "\\1\\2",
+                         as.character(ds.stat$file), perl=TRUE, ignore.case=TRUE)
+    ds.stat[, c(2,3,4,6)] <- round(ds.stat[, c(2,3,4,6)] / 1000000, digits = 4)
+    names(ds.stat) <- c("File", "Lines (mil)", "Words (mil)",
+                        "Unique (mil)", "% Unique", "Bytes (MB)") 
+} 
+```
+```{r echo=FALSE,results='asis'}
+xt <- xtable(ds.stat)
+print(xt, type='html')
 ```
 
 ## Data Preparation
 
 We will primarily work with English dataset. Working with full English dataset took long time for the desktop computer. So we decided to break the data into a smaller set for this report: 
 
-```{r echo=FALSE}
-data.frame(Type=c("Training %", "CV %", "Test %"), Project=c(60,20,20), Report=c(5, NA, NA))
+```{r echo=FALSE,results='asis'}
+xt <- xtable(data.frame(Type=c("Training %", "CV %", "Test %"),
+                        Project=c(60,20,20), Report=c(5, NA, NA)))
+print(xt, type='html')
 ```
 
 Thus the English training data for this report looks as follows:
-```{r}
-
+```{r echo=FALSE}
 #prepare training,cv,test data into data.05 folder. 
 #0.5% training data extraction is currently hardcoded
 ds <- get_dataset("data.05")
-if (!exists("ds.linecount.report")) ds.linecount.report <- get_dataset_lines("data.05")
-if (!exists("ds.wordcount.report")) ds.wordcount.report <- get_dataset_words("data.05")
-stat <- merge(ds.wordcount.report, ds.wordcount.report)
-stat$file <- gsub("data.05/.*/(..)_..(.*).txt.(.*)", "\\1\\2 \\3",
-                  as.character(stat$file), perl=TRUE, ignore.case=TRUE)
-stat <- stat[grep("^en", stat$file),]
-stat
+
+if (!exists("ds.prep.stat")) {
+    ds.prep.stat <- get_dataset_stats("data.05")
+    ds.prep.stat$file <- gsub("data.05/.*/(..)_..(.*).txt.(.*)", "\\1\\2 \\3",
+                              as.character(ds.prep.stat$file), 
+                              perl=TRUE, ignore.case=TRUE)
+    ds.prep.stat[, c(2,3,4,6)] <- round(ds.prep.stat[, c(2,3,4,6)] / 1000000, digits = 4)
+    names(ds.prep.stat) <- c("File", "Lines (mil)", "Words (mil)", 
+                         "Unique (mil)", "% Unique", "Bytes (MB)")    
+    ds.prep.stat <- ds.prep.stat[grep("^en", ds.prep.stat$File),]
+}
+```
+```{r echo=FALSE,results='asis'}
+xt <- xtable(ds.prep.stat)
+print(xt, type='html')
 ```
 
 ## Data Analysis

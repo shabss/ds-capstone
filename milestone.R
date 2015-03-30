@@ -2,6 +2,88 @@
 library(tm)
 library(slam)
 
+
+dataset.recurse <- function (indir, outdir, func) {
+    files <- list.files(indir);
+    for (file in files) {
+        fn <- paste(indir, "/", file, sep = "")
+        info <- file.info(fn) 
+        if (info$isdir) {
+            od <- paste(outdir, "/", file, sep="");
+            dataset.recurse(fn, od, func)
+            func(fn, od);
+        } else {
+            func(indir, outdir, file)
+        }
+    }
+}
+
+######################
+
+dataset.getstat.unique <- function(indir, outdir, file=NULL) {
+    
+    do.it <- is.null(file) && (length(list.files(path=indir, pattern="*.txt*")) > 0) 
+    #print(paste(indir, outdir, file, do.it, sep=", "))    
+    if (do.it) {        
+        #tr 'A-Z' 'a-z' < file | tr -sc 'A-za-z' '\n'| sort | uniq | wc -l
+        #cat %1 | tr 'A-Z' 'a-z'| tr -sc 'A-za-z' '\n'| sort | uniq | wc -l
+        wc.uniquewords <- data.frame(file=c(), words=c())
+        for (f in list.files(path=indir, pattern="*.txt*")) {
+            #above command gave me errors (using cygwin on windows) so i created a 
+            #batch file unique_word_count with the following content:
+            #@cat %1 | tr 'A-Z' 'a-z'| tr -sc 'A-Za-z' '\n'| uniq | wc -l
+            cmd <- paste("unique_word_count ", indir, "/", f, sep="")
+            #print(cmd)
+            wc.out <- system(cmd, intern=TRUE)
+            #print(wc.out)
+            wc.uniquewords <- rbind(wc.uniquewords, 
+                                    data.frame(file=paste(indir,"/", f, sep=""), 
+                                               unique=as.integer(wc.out))) 
+        }
+    }
+    wc.uniquewords
+}
+
+dataset.getstat <- function(indir, outdir, file=NULL) {
+    do.it <- is.null(file) && (length(list.files(path=indir, pattern="*.txt*")) > 0) 
+    #print(paste(indir, outdir, file, do.it, sep=", "))    
+    if (do.it) {
+        lwc <- system(paste("wc -lwc ", indir,"/*.txt*", sep=""), intern=TRUE)
+        lwc <- gsub("(\\d+)\\s*(\\d+)\\s*(\\d+)\\s*(.*)$", "\\1,\\2,\\3,\\4", 
+                    lwc, perl=TRUE, ignore.case=TRUE)
+        con <- textConnection(lwc)
+        lwc <- read.csv(con, header=FALSE, col.names=c("lines", "words", "bytes", "file"))
+        close(con)
+        lwc <- lwc[-nrow(lwc), ]
+        #print(lwc)
+        
+        unq <- dataset.getstat.unique(indir, outdir, file)
+        #print(unq)
+        
+        stat <- merge(lwc, unq);
+        stat$ratio <- round(unq$unique / lwc$words, digits = 4) * 100
+        #print(stat)
+        
+        stat <- stat[, c(1, 2, 3, 5, 6, 4)] #file, lines, words, unique, ratio, bytes
+        #print(stat)
+        
+        if (exists("dataset.stat")) {
+            stat <- rbind(dataset.stat, stat)
+        }         
+        #print(lwurc)
+        dataset.stat <<- stat
+    }    
+}
+
+get_dataset_stats <- function(base) {
+    dataset.recurse(base, NULL, dataset.getstat)
+    stat <- dataset.stat
+    rm("dataset.stat", pos=.GlobalEnv)
+    stat    
+}
+
+######################
+
 dataset.partition <-function(indir, outdir, file) {
     #print(paste(indir, outdir, file, sep=", "))    
     if (!file.exists(outdir)) {
@@ -44,105 +126,6 @@ dataset.create <- function (indir, outdir, file=NULL) {
     }
     0
 }
-
-dataset.recurse <- function (indir, outdir, func) {
-    files <- list.files(indir);
-    for (file in files) {
-        fn <- paste(indir, "/", file, sep = "")
-        info <- file.info(fn) 
-        if (info$isdir) {
-            od <- paste(outdir, "/", file, sep="");
-            dataset.recurse(fn, od, func)
-            func(fn, od);
-        } else {
-            func(indir, outdir, file)
-        }
-    }
-}
-
-######################
-dataset.linecount <- function(indir, outdir, file=NULL) {
-    
-    do.it <- is.null(file) && (length(list.files(path=indir, pattern="*.txt*")) > 0) 
-    #print(paste(indir, outdir, file, do.it, sep=", "))    
-    if (do.it) {
-        wcl <- system(paste("wc -l ", indir,"/*.txt*", sep=""), intern=TRUE)
-        wcl <- gsub("(\\d+)\\s*(.*)$", "\\1,\\2", wcl, perl=TRUE, ignore.case=TRUE)
-        con <- textConnection(wcl)
-        wcl <- read.csv(con, header=FALSE, col.names=c("lines", "file"))
-        close(con)
-        wcl <- wcl[-nrow(wcl),]
-        if (exists("dataset.lc")) {
-            wcl <- rbind(dataset.lc, wcl)
-        }         
-        #print(wcl)
-        dataset.lc <<- wcl
-    }
-}
-
-get_dataset_lines <- function(base) {
-    dataset.recurse(base, NULL, dataset.linecount)
-    dlc <- dataset.lc
-    rm("dataset.lc", pos=.GlobalEnv)
-    dlc
-}
-######################
-
-parse_wc_output <- function(wc) {
-    wc <- gsub("(\\d+)\\s*(.*)$", "\\1,\\2", wc, perl=TRUE, ignore.case=TRUE)
-    con <- textConnection(wc)
-    wc <- read.csv(con, header=FALSE, col.names=c("words", "file"))
-    close(con)
-    wc <- wc[-nrow(wc),]
-    wc <- wc[order(wc$file),]
-}
-
-dataset.wordcount <- function(indir, outdir, file=NULL) {
-    
-    do.it <- is.null(file) && (length(list.files(path=indir, pattern="*.txt*")) > 0) 
-    #print(paste(indir, outdir, file, do.it, sep=", "))    
-    if (do.it) {
-
-        wc.allwords <- system(paste("wc -c ", indir,"/*.txt*", sep=""), intern=TRUE)
-        wc.allwords <- parse_wc_output(wc.allwords)
-
-        
-        #tr 'A-Z' 'a-z' < file | tr -sc 'A-za-z' '\n'| uniq | wc -l
-        #cat file | tr 'A-Z' 'a-z' | tr -sc 'A-za-z' '\n'| uniq | wc -l
-        wc.uniquewords <- data.frame(file=c(), words=c())
-        for (f in list.files(path=indir, pattern="*.txt*")) {
-            #above command gave me errors (using cygwin on windows) so i created a 
-            #batch file unique_word_count with the following content:
-            #@cat %1 | tr 'A-Z' 'a-z'| tr -sc 'A-za-z' '\n'| uniq | wc -l
-            cmd <- paste("unique_word_count ", indir, "/", f, sep="")
-            #print(cmd)
-            wc.out <- system(cmd, intern=TRUE)
-            #print(wc.out)
-            wc.uniquewords <- rbind(wc.uniquewords, data.frame(file=f, words=as.integer(wc.out))) 
-        }
-        wc.uniquewords <- wc.uniquewords[order(wc.uniquewords$file),]
-        
-        #To Do: Make sure that files are getting the corresponding unique words
-        #for now i am assuming that sorting will suffice
-        wc <- data.frame(file=wc.allwords$file, 
-                         words=wc.allwords$words, 
-                         unique=wc.uniquewords$words)
-        if (exists("dataset.wc")) {
-            wc <- rbind(dataset.wc, wc)
-        }         
-        #print(wcl)
-        dataset.wc <<- wc
-    }
-}
-
-get_dataset_words <- function(base) {
-    dataset.recurse(base, NULL, dataset.wordcount)
-    dwc <- dataset.wc
-    rm("dataset.wc", pos=.GlobalEnv)
-    dwc    
-}
-
-######################
 
 get_dataset <- function(outdir) {
     if (!file.exists(outdir)) {
