@@ -1,19 +1,19 @@
 
 library(tm)
 library(slam)
+library(stringi)
 
-
-dataset.recurse <- function (indir, outdir, func) {
+dataset.recurse <- function (indir, outdir, func, param) {
     files <- list.files(indir);
     for (file in files) {
         fn <- paste(indir, "/", file, sep = "")
         info <- file.info(fn) 
         if (info$isdir) {
             od <- paste(outdir, "/", file, sep="");
-            dataset.recurse(fn, od, func)
-            func(fn, od);
+            dataset.recurse(fn, od, func, param)
+            func(fn, od, NULL, param);
         } else {
-            func(indir, outdir, file)
+            func(indir, outdir, file, param)
         }
     }
 }
@@ -44,7 +44,7 @@ dataset.getstat.unique <- function(indir, outdir, file=NULL) {
     wc.uniquewords
 }
 
-dataset.getstat <- function(indir, outdir, file=NULL) {
+dataset.getstat <- function(indir, outdir, file=NULL, param) {
     do.it <- is.null(file) && (length(list.files(path=indir, pattern="*.txt*")) > 0) 
     #print(paste(indir, outdir, file, do.it, sep=", "))    
     if (do.it) {
@@ -84,7 +84,19 @@ get_dataset_stats <- function(base) {
 
 ######################
 
-dataset.partition <-function(indir, outdir, file) {
+dataset.scale.breakdown <- function(breakdown) {
+    p.sum <- breakdown$train + breakdown$cv + breakdown$test 
+    p.train <- breakdown$train / p.sum 
+    p.cv <- breakdown$cv / p.sum
+    p.test <- breakdown$cv / p.sum
+    
+    #scale p.cv and p.test to remaining datase
+    p.cv <- p.cv / (1 - p.train)
+    p.test <- p.test / ( 1 - p.train)
+    list(train=p.train, cv=p.cv, test=p.test)
+}
+
+dataset.partition <-function(indir, outdir, file, breakdown) {
     #print(paste(indir, outdir, file, sep=", "))    
     if (!file.exists(outdir)) {
         dir.create(outdir, recursive=TRUE)
@@ -93,17 +105,15 @@ dataset.partition <-function(indir, outdir, file) {
     fn.full <- paste(indir,"/", file, sep="")
     
     #40% train 60% rest - Do 5% for now to get small file sizes
-    p.train <- 0.05 
-    p.cv <- 0.50; p.test <- 0.50 #50-50 of remaining 60%
-    
+    bd <- dataset.scale.breakdown(breakdown)
     #gawk 'BEGIN {srand()} {f = FILENAME (rand() <= 0.8 ? ".80" : ".20"); print >f}' en_US.blogs.txt
     cmd <- paste("gawk 'BEGIN {srand()} {f = ", 
-                 "FILENAME (rand() <= ", as.character(p.train), " ? \".train\" : \".rest\"); print >f}' ",
+                 "FILENAME (rand() <= ", as.character(bd$train), " ? \".train\" : \".rest\"); print >f}' ",
                  fn.full, sep="")
     system(cmd)
     
     cmd <- paste("gawk 'BEGIN {srand()} {f = ", 
-                 "FILENAME (rand() <= ", as.character(p.cv), " ? \".cv\" : \".test\"); print >f}' ",
+                 "FILENAME (rand() <= ", as.character(bd$cv), " ? \".cv\" : \".test\"); print >f}' ",
                  fn.full, ".rest", sep="")
     system(cmd)
     
@@ -113,7 +123,7 @@ dataset.partition <-function(indir, outdir, file) {
     file.remove(paste(fn.full, ".rest", sep=""))    
 }
 
-dataset.create <- function (indir, outdir, file=NULL) {
+dataset.create <- function (indir, outdir, file, breakdown) {
     if (!file.exists(outdir)) {
         dir.create(outdir, recursive=TRUE)
     }
@@ -122,83 +132,71 @@ dataset.create <- function (indir, outdir, file=NULL) {
     #            " grep .txt=", grepl(".txt$", if(is.null(file)) "a" else file, ignore.case=TRUE), 
     #            sep=''))
     if ((!is.null(file) && grepl(".txt$", file, ignore.case=TRUE))) {
-        dataset.partition(indir, outdir, file)
+        dataset.partition(indir, outdir, file, breakdown)
     }
-    0
 }
 
-get_dataset <- function(outdir) {
+get_dataset <- function(outdir, breakdown) {
     if (!file.exists(outdir)) {
         if (!file.exists("Coursera-SwiftKey.zip")) {
             download.file("https://d396qusza40orc.cloudfront.net/dsscapstone/dataset/Coursera-SwiftKey.zip",
                           "Coursera-SwiftKey.zip", mode="wb")
-            unzip("Coursera-SwiftKey.zip")
+            unzip("Coursera-SwiftKey.zip", exdir = "Coursera-SwiftKey")
         }
         
         if (!file.exists("profanity.txt")) {
-            download.file("https://gist.github.com/ryanlewis/a37739d710ccdb4b406d",
-                          "profanity.txt", mode="wt")
+            url <- "https://gist.githubusercontent.com/ryanlewis/a37739d710ccdb4b406d/raw/3b70dd644cec678ddc43da88d30034add22897ef/google_twunter_lol"
+            download.file(url, "profanity.txt", mode="wt")
         }    
         dataset.recurse("Coursera-SwiftKey/final/",
-                        outdir,
-                        dataset.create)
+                        outdir, dataset.create, breakdown)
     }
 }
 ###########################
 ###########################
 
-library("RWeka")
-library("tm")
+#dont load RWeka due to multi-core issues. See link below
+#http://stackoverflow.com/questions/17703553/bigrams-instead-of-single-words-in-termdocument-matrix-using-r-and-rweka/20251039
+#library(RWeka) 
+
 
 #profanity obtained from https://gist.github.com/ryanlewis/a37739d710ccdb4b406d
 
-make_ngram_table <- function (file, ngram, lang="en") {
-
+preProcessCorpus <- function(dir, pattern) {
     p1 <- proc.time()
     if (!exists("profanity")) {
-        profanity <<- readLines("profanity.txt")
+        profanity <<- readLines("profanity.txt", warn=FALSE, skipNul=TRUE)
     }
-    dat <- readLines(file)
-    corp <- Corpus(VectorSource(dat),
-                   readerControl = list(reader=readPlain, 
-                                        language=lang, 
-                                        load=TRUE)
-                   #, dbControl = list(useDb = TRUE, dbName = "./nlpdb.db", type="DB1"
-    )    
-    tokenizer <- function(x) NGramTokenizer(x, Weka_control(min = ngram, max = ngram))
-    tdm <- TermDocumentMatrix(corp, control = list(
-        tokenize = tokenizer, 
-        tolower = TRUE,
-        removeWords = profanity,
-        
-        removePunctuation = TRUE,
-        stopwords = TRUE,
-        removeNumbers = TRUE,
-        stripWhitespace = TRUE))
+    #dat <- readLines(file)
+    if (is.null(pattern)) {
+        pattern = "*"
+    }
+    corp <- Corpus(DirSource(dir, pattern=pattern), 
+                   readerControl = list(reader=readPlain,
+                                        language="en", #hardcode for now 
+                                        load=TRUE))
     
-    #print(proc.time() - p1)
-    tdm
+    corp <- tm_map(corp, content_transformer(tolower))
+    corp <- tm_map(corp, content_transformer(removePunctuation))
+    corp <- tm_map(corp, stripWhitespace)
+    corp <- tm_map(corp, removeWords, c(stopwords("english"), profanity))
+    corp <- tm_map(corp, content_transformer(removeNumbers))
+    corp <- tm_map(corp, PlainTextDocument)
 }
 
-do_milestone <- function() {
-    ds <- get_dataset("data.05")
-    if (!exists("ds.linecount")) ds.linecount <- get_dataset_lines("Coursera-SwiftKey/final")
-    if (!exists("ds.wordcount")) ds.wordcount <- get_dataset_words("Coursera-SwiftKey/final")
-    
-    print(ds.linecount)
-    print(ds.wordcount)
-    
-    if (!exists("en.blogs.1grams")) en.blogs.1grams <- make_ngram_table("data.05/en_US/en_US.blogs.txt.train", 1)
-    if (!exists("en.blogs.2grams")) en.blogs.2grams <- make_ngram_table("data.05/en_US/en_US.blogs.txt.train", 2)
-    if (!exists("en.blogs.3grams")) en.blogs.3grams <- make_ngram_table("data.05/en_US/en_US.blogs.txt.train", 3)
-    
-    if (!exists("en.twitter.1grams")) en.twitter.1grams <- make_ngram_table("data.05/en_US/en_US.twitter.txt.train", 1)
-    if (!exists("en.twitter.2grams")) en.twitter.2grams <- make_ngram_table("data.05/en_US/en_US.twitter.txt.train", 2)
-    if (!exists("en.twitter.3grams")) en.twitter.3grams <- make_ngram_table("data.05/en_US/en_US.twitter.txt.train", 3)
-    
-    if (!exists("en.news.1grams")) en.news.1grams <- make_ngram_table("data.05/en_US/en_US.news.txt.train", 1)
-    if (!exists("en.news.2grams")) en.news.2grams <- make_ngram_table("data.05/en_US/en_US.news.txt.train", 2)
-    if (!exists("en.news.3grams")) en.news.3grams <- make_ngram_table("data.05/en_US/en_US.news.txt.train", 3)
+make_ngram_table <- function (corp, ngram) {
+    tokenizer <- function(x) RWeka::NGramTokenizer(x, RWeka::Weka_control(min = ngram, max = ngram))
+    tdm <- TermDocumentMatrix(corp, control = list(tokenize = tokenizer))
+}
+
+make_ngrams <- function(dir) {
+    if (!file.exists(dir)) get_dataset(dir, breakdown=list(train=0.10, cv=.45, test=.45))
+    if (!exists("en.corp")) en.corp <<- preProcessCorpus(paste0(dir,"/en_US/"), "*.train")
+    if (!exists("en.1grams")) en.1grams <<- make_ngram_table(en.corp, 1)
+    if (!exists("en.2grams")) en.2grams <<- make_ngram_table(en.corp, 2)
+    if (!exists("en.3grams")) en.3grams <<- make_ngram_table(en.corp, 3)
+    if (!exists("en.4grams")) en.4grams <<- make_ngram_table(en.corp, 4)
+    if (!exists("en.5grams")) en.5grams <<- make_ngram_table(en.corp, 5)
     
     #work               user    system  elapsed 
     #en.blogs.1grams    131.21   42.82  174.87 
@@ -210,11 +208,12 @@ do_milestone <- function() {
     #en.news.1grams     156.26   48.74  205.89 
     #en.news.2grams     183.62   48.34  232.95
     #en.news.3grams     210.54   50.61  261.91
-
 }
 
 
 freq_ngrams <- function(tdm, limit, title) {
+    mar.old <-par("mar")
+    par(mar=c(2,15,2, 2))
     tdm <- rollup(tdm, 2, na.rm=TRUE, FUN = sum)
     freq <- sort(rowSums(as.matrix(tdm)), decreasing=TRUE)
     freq <- data.frame(word=names(freq), freq=freq)
@@ -225,11 +224,10 @@ freq_ngrams <- function(tdm, limit, title) {
         title <- if (!is.null(limit)) paste("Top", limit, title) else title
         bp <- barplot(freq$freq, main=title, 
                       horiz=TRUE,
-                      names.arg=c(as.character(freq$word)), cex.names=0.8, las=1)
+                      names.arg=c(as.character(freq$word)), cex.names=0.7, las=1)
     }
-    #f <- list(freq=freq, plot = bp);
-    bp
-    freq
+    f <- list(freq=freq, plot = bp);
+    par(mar=mar.old)
 }
 
 

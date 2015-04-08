@@ -14,16 +14,20 @@ The purpose of this report is to establish an understanding of basic tasks requi
 ## Data Analysis Level 1
 The data was obtained from the link https://d396qusza40orc.cloudfront.net/dsscapstone/dataset/Coursera-SwiftKey.zip, which is provided by the course instructures. The zip contains copora of blogs, news and twitter in 4 languages English, Dutch, French and Russian. The statistics of the combined corpous is as follows: 
 
-```{r echo=FALSE}
+```{r initialize,echo=TRUE,messages=FALSE}
 source("milestone.R")
 library(xtable)
+```
+
+```{r get_dataset_stats,echo=TRUE,messages=FALSE,cache=TRUE}
 if (!exists("ds.stat")) {
-    ds.stat <- get_dataset_stats("Coursera-SwiftKey/final")
-    ds.stat$file <- gsub("Coursera-Swiftkey/final/.*/(..)_..(.*).txt", "\\1\\2",
-                         as.character(ds.stat$file), perl=TRUE, ignore.case=TRUE)
-    ds.stat[, c(2,3,4,6)] <- round(ds.stat[, c(2,3,4,6)] / 1000000, digits = 4)
-    names(ds.stat) <- c("File", "Lines (mil)", "Words (mil)",
-                        "Unique (mil)", "% Unique", "Bytes (MB)") 
+    dss <- get_dataset_stats("Coursera-SwiftKey/final")
+    dss$file <- gsub("Coursera-Swiftkey/final/.*/(..)_..(.*).txt", "\\1\\2",
+                     as.character(dss$file), perl=TRUE, ignore.case=TRUE)
+    dss[, c(2,3,4,6)] <- round(dss[, c(2,3,4,6)] / 1000000, digits = 4)
+    names(dss) <- c("File", "Lines (mil)", "Words (mil)",
+                    "Unique (mil)", "% Unique", "Bytes (MB)") 
+    ds.stat <<- dss
 } 
 ```
 ```{r echo=FALSE,results='asis'}
@@ -35,30 +39,33 @@ print(xt, type='html')
 
 We will primarily work with English dataset. Working with full English dataset took long time for the desktop computer. So we decided to break the data into a smaller set for this report: 
 
-```{r echo=FALSE,results='asis'}
+```{r breakdown_info,echo=TRUE}
+breakdown = list(train=60, cv=20, test=20)
 xt <- xtable(data.frame(Type=c("Training %", "CV %", "Test %"),
-                        Project=c(60,20,20), Report=c(5, NA, NA)))
+                        Project=unlist(breakdown), Report=c(5, NA, NA)))
+```
+```{r display_breakdown_info,echo=FALSE,results='asis'}
 print(xt, type='html')
 ```
 
 Thus the English training data for this report looks as follows:
-```{r echo=FALSE}
-#prepare training,cv,test data into data.05 folder. 
-#0.5% training data extraction is currently hardcoded
-ds <- get_dataset("data.05")
+```{r get_dataset,echo=TRUE,cache=TRUE}
+
+train.dir <- sprintf("data.%02d", breakdown$train)
+ds <- get_dataset(train.dir, breakdown)
 
 if (!exists("ds.prep.stat")) {
-    ds.prep.stat <- get_dataset_stats("data.05")
-    ds.prep.stat$file <- gsub("data.05/.*/(..)_..(.*).txt.(.*)", "\\1\\2 \\3",
-                              as.character(ds.prep.stat$file), 
-                              perl=TRUE, ignore.case=TRUE)
-    ds.prep.stat[, c(2,3,4,6)] <- round(ds.prep.stat[, c(2,3,4,6)] / 1000000, digits = 4)
-    names(ds.prep.stat) <- c("File", "Lines (mil)", "Words (mil)", 
-                         "Unique (mil)", "% Unique", "Bytes (MB)")    
-    ds.prep.stat <- ds.prep.stat[grep("^en", ds.prep.stat$File),]
+    dps <- get_dataset_stats(train.dir)
+    dps$file <- gsub(paste0(train.dir,"/.*/(..)_..(.*).txt.(.*)"), "\\1\\2 \\3",
+                     as.character(dps$file),
+                     perl=TRUE, ignore.case=TRUE)
+    dps[, c(2,3,4,6)] <- round(dps[, c(2,3,4,6)] / 1000000, digits = 4)
+    names(dps) <- c("File", "Lines (mil)", "Words (mil)",
+                    "Unique (mil)", "% Unique", "Bytes (MB)")    
+    ds.prep.stat <<- dps[grep("^en", dps$File),]
 }
 ```
-```{r echo=FALSE,results='asis'}
+```{r display_dataset_info,echo=FALSE,results='asis'}
 xt <- xtable(ds.prep.stat)
 print(xt, type='html')
 ```
@@ -66,34 +73,16 @@ print(xt, type='html')
 ## Data Analysis
 
 The 1-gram, 2-gram and 3-gram for Blogs, Twitter and News are as follows:
-```{r echo=FALSE}
-if (!exists("en.blogs.1grams")) en.blogs.1grams <- make_ngram_table("data.05/en_US/en_US.blogs.txt.train", 1)
-if (!exists("en.blogs.2grams")) en.blogs.2grams <- make_ngram_table("data.05/en_US/en_US.blogs.txt.train", 2)
-if (!exists("en.blogs.3grams")) en.blogs.3grams <- make_ngram_table("data.05/en_US/en_US.blogs.txt.train", 3)
+```{r make_ngrams,echo=TRUE,cache=TRUE}
+make_ngrams(train.dir)
+```
+```{r show_ngrams,echo=TRUE,fig.height=20}
+(freq.en.1grams <<- freq_ngrams(en.1grams, 100, "EN 1-Grams"))$plot
+(freq.en.2grams <<- freq_ngrams(en.2grams, 100, "EN 2-Grams"))$plot
+(freq.en.3grams <<- freq_ngrams(en.3grams, 100, "EN 3-Grams"))$plot
+(freq.en.4grams <<- freq_ngrams(en.4grams, 100, "EN 4-Grams"))$plot
+(freq.en.5grams <<- freq_ngrams(en.5grams, 100, "EN 5-Grams"))$plot
 
-if (!exists("en.twitter.1grams")) en.twitter.1grams <- make_ngram_table("data.05/en_US/en_US.twitter.txt.train", 1)
-if (!exists("en.twitter.2grams")) en.twitter.2grams <- make_ngram_table("data.05/en_US/en_US.twitter.txt.train", 2)
-if (!exists("en.twitter.3grams")) en.twitter.3grams <- make_ngram_table("data.05/en_US/en_US.twitter.txt.train", 3)
-
-if (!exists("en.news.1grams")) en.news.1grams <- make_ngram_table("data.05/en_US/en_US.news.txt.train", 1)
-if (!exists("en.news.2grams")) en.news.2grams <- make_ngram_table("data.05/en_US/en_US.news.txt.train", 2)
-if (!exists("en.news.3grams")) en.news.3grams <- make_ngram_table("data.05/en_US/en_US.news.txt.train", 3)
-
-freq.en.blogs.1grams <- freq_ngrams(en.blogs.1grams, 25, "Most Frequent EN Blogs 1-Grams")
-freq.en.blogs.2grams <- freq_ngrams(en.blogs.2grams, 25, "Most Frequent EN Blogs 2-Grams")
-freq.en.blogs.3grams <- freq_ngrams(en.blogs.3grams, 25, "Most Frequent EN Blogs 3-Grams")
-
-freq.en.twitter.1grams <- freq_ngrams(en.twitter.1grams, 25, "Most Frequent EN Twitter 1-Grams")
-freq.en.twitter.2grams <- freq_ngrams(en.twitter.2grams, 25, "Most Frequent EN Twitter 2-Grams")
-freq.en.twitter.3grams <- freq_ngrams(en.twitter.3grams, 25, "Most Frequent EN Twitter 3-Grams")
-
-freq.en.news.1grams <- freq_ngrams(en.news.1grams, 25, "Most Frequent EN News 1-Grams")
-freq.en.news.2grams <- freq_ngrams(en.news.2grams, 25, "Most Frequent EN News 2-Grams")
-freq.en.news.3grams <- freq_ngrams(en.news.3grams, 25, "Most Frequent EN News 3-Grams")
-
-#freq.en.blogs.1grams; freq.en.blogs.2grams; freq.en.blogs.3grams
-#freq.en.twitter.1grams; freq.en.twitter.2grams; freq.en.twitter.3grams
-#freq.en.news.1grams; freq.en.news.2grams; freq.en.news.3grams
 ```
 
 
