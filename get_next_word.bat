@@ -1,0 +1,1 @@
+@grep -oh "%1 [a-z]\+" %2/*.txt | sort | uniq -c | sort -n
