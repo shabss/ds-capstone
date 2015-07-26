@@ -15,10 +15,11 @@ The purpose of this report is to establish an understanding of basic tasks requi
 The entire source code used to generate this report can be downloaded from https://github.com/shabss/ds-capstone.
 
 ## Data Analysis Level 1
-The data was obtained from the link https://d396qusza40orc.cloudfront.net/dsscapstone/dataset/Coursera-SwiftKey.zip, which is provided by within the course. The zip contains copora of blogs, news and twitter in 4 languages English, Dutch, French and Russian. The statistics of the combined corpous is as follows: 
+The data was obtained from the link https://d396qusza40orc.cloudfront.net/dsscapstone/dataset/Coursera-SwiftKey.zip, which is provided with the course. The zip contains copora of blogs, news and twitter in 4 languages English, Dutch, French and Russian. The statistics of the combined corpous is as follows: 
 
 ```{r initialize,echo=FALSE,messages=FALSE}
 library(xtable)
+source("milestone.R")
 ```
 
 ```{r get_dataset_stats,echo=TRUE,messages=FALSE}
@@ -35,7 +36,9 @@ if (!exists("ds.stat")) {
 ```
 ```{r echo=FALSE,results='asis'}
 xt <- xtable(ds.stat)
-print(xt, type='html')
+print(xt, type='html', 
+      html.table.attributes="border='5px solid black' align='center'", 
+      include.rownames=FALSE)
 ```
 
 ## Data Preparation
@@ -50,7 +53,9 @@ xt <- xtable(data.frame(Type=c("Training %", "CV %", "Test %"),
                         Report=unlist(report.breakdown)))
 ```
 ```{r display_breakdown_info,echo=FALSE,results='asis'}
-print(xt, type='html')
+print(xt, type='html', 
+      html.table.attributes="border='5px solid black' align='center'", 
+      include.rownames=FALSE)
 ```
 
 Thus the English training data for this report looks as follows:
@@ -71,7 +76,9 @@ if (!exists("ds.prep.stat")) {
 ```
 ```{r display_dataset_info,echo=FALSE,results='asis'}
 xt <- xtable(ds.prep.stat)
-print(xt, type='html')
+print(xt, type='html', 
+      html.table.attributes="border='5px solid black' align='center'", 
+      include.rownames=FALSE)
 ```
 
 ## Data Analysis
@@ -88,7 +95,7 @@ freq.en.3grams <<- freq_ngrams(en.3grams, 100, "EN 3-Grams");
 freq.en.4grams <<- freq_ngrams(en.4grams, 100, "EN 4-Grams");
 freq.en.5grams <<- freq_ngrams(en.5grams, 100, "EN 5-Grams");
 ```
-```{r show_ngrams,echo=TRUE,fig.height=20}
+```{r show_ngrams,echo=FALSE,fig.height=20}
 #freq.en.1grams$plot
 #freq.en.2grams$plot
 #freq.en.3grams$plot
@@ -122,6 +129,7 @@ To reduce the data foot print other NLP smooting methods besides backoff smootin
 
 ### Application Execution
 Since ShinyApps server can only accept limited amount of data, following strategy will be employed:
+
    1. Upload a compressed dictionary of words and indexed N-grams. 
    2. If the data is still larger than what ShinyApps server allows then build a restful interface on Amazon to serve the initialization data.
 

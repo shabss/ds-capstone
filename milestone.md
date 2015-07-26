@@ -15,7 +15,7 @@ The purpose of this report is to establish an understanding of basic tasks requi
 The entire source code used to generate this report can be downloaded from https://github.com/shabss/ds-capstone.
 
 ## Data Analysis Level 1
-The data was obtained from the link https://d396qusza40orc.cloudfront.net/dsscapstone/dataset/Coursera-SwiftKey.zip, which is provided by within the course. The zip contains copora of blogs, news and twitter in 4 languages English, Dutch, French and Russian. The statistics of the combined corpous is as follows: 
+The data was obtained from the link https://d396qusza40orc.cloudfront.net/dsscapstone/dataset/Coursera-SwiftKey.zip, which is provided with the course. The zip contains copora of blogs, news and twitter in 4 languages English, Dutch, French and Russian. The statistics of the combined corpous is as follows: 
 
 
 
@@ -32,28 +32,22 @@ if (!exists("ds.stat")) {
     ds.stat <<- dss
 } 
 ```
-
-```
-## Warning in xtable(ds.stat): internal error -3 in R_decompress1
-```
-
-```
-## Error in xtable(ds.stat): lazy-load database 'c:/projects/edu/ds-capstone/cache/get_dataset_stats_028fbab95108d4afcf84154ec008f22a.rdb' is corrupt
-```
-
 <!-- html table generated in R 3.1.3 by xtable 1.7-4 package -->
-<!-- Sun Jul 26 10:56:24 2015 -->
-<table border=1>
-<tr> <th>  </th> <th> File </th> <th> Lines (mil) </th> <th> Words (mil) </th> <th> Unique (mil) </th> <th> % Unique </th> <th> Bytes (MB) </th>  </tr>
-  <tr> <td align="right"> 10 </td> <td> en.blogs cv </td> <td align="right"> 0.40 </td> <td align="right"> 16.75 </td> <td align="right"> 0.17 </td> <td align="right"> 1.03 </td> <td align="right"> 94.07 </td> </tr>
-  <tr> <td align="right"> 11 </td> <td> en.blogs test </td> <td align="right"> 0.40 </td> <td align="right"> 16.76 </td> <td align="right"> 0.17 </td> <td align="right"> 1.03 </td> <td align="right"> 94.07 </td> </tr>
-  <tr> <td align="right"> 12 </td> <td> en.blogs train </td> <td align="right"> 0.09 </td> <td align="right"> 3.76 </td> <td align="right"> 0.08 </td> <td align="right"> 2.24 </td> <td align="right"> 21.12 </td> </tr>
-  <tr> <td align="right"> 13 </td> <td> en.news cv </td> <td align="right"> 0.45 </td> <td align="right"> 15.43 </td> <td align="right"> 0.15 </td> <td align="right"> 0.99 </td> <td align="right"> 92.13 </td> </tr>
-  <tr> <td align="right"> 14 </td> <td> en.news test </td> <td align="right"> 0.46 </td> <td align="right"> 15.45 </td> <td align="right"> 0.15 </td> <td align="right"> 0.99 </td> <td align="right"> 92.21 </td> </tr>
-  <tr> <td align="right"> 15 </td> <td> en.news train </td> <td align="right"> 0.10 </td> <td align="right"> 3.43 </td> <td align="right"> 0.08 </td> <td align="right"> 2.36 </td> <td align="right"> 20.46 </td> </tr>
-  <tr> <td align="right"> 16 </td> <td> en.twitter cv </td> <td align="right"> 1.06 </td> <td align="right"> 13.66 </td> <td align="right"> 0.19 </td> <td align="right"> 1.42 </td> <td align="right"> 74.17 </td> </tr>
-  <tr> <td align="right"> 17 </td> <td> en.twitter test </td> <td align="right"> 1.06 </td> <td align="right"> 13.64 </td> <td align="right"> 0.19 </td> <td align="right"> 1.42 </td> <td align="right"> 74.07 </td> </tr>
-  <tr> <td align="right"> 18 </td> <td> en.twitter train </td> <td align="right"> 0.24 </td> <td align="right"> 3.04 </td> <td align="right"> 0.08 </td> <td align="right"> 2.77 </td> <td align="right"> 16.51 </td> </tr>
+<!-- Sun Jul 26 12:38:24 2015 -->
+<table border='5px solid black' align='center'>
+<tr> <th> File </th> <th> Lines (mil) </th> <th> Words (mil) </th> <th> Unique (mil) </th> <th> % Unique </th> <th> Bytes (MB) </th>  </tr>
+  <tr> <td> de.blogs </td> <td align="right"> 0.37 </td> <td align="right"> 12.61 </td> <td align="right"> 0.39 </td> <td align="right"> 3.06 </td> <td align="right"> 85.46 </td> </tr>
+  <tr> <td> de.news </td> <td align="right"> 0.24 </td> <td align="right"> 13.20 </td> <td align="right"> 0.38 </td> <td align="right"> 2.88 </td> <td align="right"> 95.59 </td> </tr>
+  <tr> <td> de.twitter </td> <td align="right"> 0.95 </td> <td align="right"> 11.79 </td> <td align="right"> 0.32 </td> <td align="right"> 2.75 </td> <td align="right"> 75.58 </td> </tr>
+  <tr> <td> en.blogs </td> <td align="right"> 0.90 </td> <td align="right"> 37.27 </td> <td align="right"> 0.25 </td> <td align="right"> 0.68 </td> <td align="right"> 210.16 </td> </tr>
+  <tr> <td> en.news </td> <td align="right"> 1.01 </td> <td align="right"> 34.31 </td> <td align="right"> 0.21 </td> <td align="right"> 0.62 </td> <td align="right"> 205.81 </td> </tr>
+  <tr> <td> en.twitter </td> <td align="right"> 2.36 </td> <td align="right"> 30.34 </td> <td align="right"> 0.30 </td> <td align="right"> 1.00 </td> <td align="right"> 167.11 </td> </tr>
+  <tr> <td> fi.blogs </td> <td align="right"> 0.44 </td> <td align="right"> 12.71 </td> <td align="right"> 0.87 </td> <td align="right"> 6.81 </td> <td align="right"> 108.50 </td> </tr>
+  <tr> <td> fi.news </td> <td align="right"> 0.49 </td> <td align="right"> 10.41 </td> <td align="right"> 0.68 </td> <td align="right"> 6.54 </td> <td align="right"> 94.23 </td> </tr>
+  <tr> <td> fi.twitter </td> <td align="right"> 0.29 </td> <td align="right"> 3.15 </td> <td align="right"> 0.30 </td> <td align="right"> 9.49 </td> <td align="right"> 25.33 </td> </tr>
+  <tr> <td> ru.blogs </td> <td align="right"> 0.34 </td> <td align="right"> 2.04 </td> <td align="right"> 0.02 </td> <td align="right"> 0.99 </td> <td align="right"> 116.86 </td> </tr>
+  <tr> <td> ru.news </td> <td align="right"> 0.20 </td> <td align="right"> 1.80 </td> <td align="right"> 0.01 </td> <td align="right"> 0.54 </td> <td align="right"> 119.00 </td> </tr>
+  <tr> <td> ru.twitter </td> <td align="right"> 0.88 </td> <td align="right"> 2.42 </td> <td align="right"> 0.02 </td> <td align="right"> 0.91 </td> <td align="right"> 105.18 </td> </tr>
    </table>
 
 ## Data Preparation
@@ -69,12 +63,12 @@ xt <- xtable(data.frame(Type=c("Training %", "CV %", "Test %"),
                         Report=unlist(report.breakdown)))
 ```
 <!-- html table generated in R 3.1.3 by xtable 1.7-4 package -->
-<!-- Sun Jul 26 10:56:24 2015 -->
-<table border=1>
-<tr> <th>  </th> <th> Type </th> <th> Project </th> <th> Report </th>  </tr>
-  <tr> <td align="right"> train </td> <td> Training % </td> <td align="right"> 60.00 </td> <td align="right"> 10.00 </td> </tr>
-  <tr> <td align="right"> cv </td> <td> CV % </td> <td align="right"> 20.00 </td> <td align="right"> 45.00 </td> </tr>
-  <tr> <td align="right"> test </td> <td> Test % </td> <td align="right"> 20.00 </td> <td align="right"> 45.00 </td> </tr>
+<!-- Sun Jul 26 12:38:24 2015 -->
+<table border='5px solid black' align='center'>
+<tr> <th> Type </th> <th> Project </th> <th> Report </th>  </tr>
+  <tr> <td> Training % </td> <td align="right"> 60.00 </td> <td align="right"> 10.00 </td> </tr>
+  <tr> <td> CV % </td> <td align="right"> 20.00 </td> <td align="right"> 45.00 </td> </tr>
+  <tr> <td> Test % </td> <td align="right"> 20.00 </td> <td align="right"> 45.00 </td> </tr>
    </table>
 
 Thus the English training data for this report looks as follows:
@@ -95,18 +89,18 @@ if (!exists("ds.prep.stat")) {
 }
 ```
 <!-- html table generated in R 3.1.3 by xtable 1.7-4 package -->
-<!-- Sun Jul 26 10:56:24 2015 -->
-<table border=1>
-<tr> <th>  </th> <th> File </th> <th> Lines (mil) </th> <th> Words (mil) </th> <th> Unique (mil) </th> <th> % Unique </th> <th> Bytes (MB) </th>  </tr>
-  <tr> <td align="right"> 10 </td> <td> en.blogs cv </td> <td align="right"> 0.40 </td> <td align="right"> 16.75 </td> <td align="right"> 0.17 </td> <td align="right"> 1.03 </td> <td align="right"> 94.07 </td> </tr>
-  <tr> <td align="right"> 11 </td> <td> en.blogs test </td> <td align="right"> 0.40 </td> <td align="right"> 16.76 </td> <td align="right"> 0.17 </td> <td align="right"> 1.03 </td> <td align="right"> 94.07 </td> </tr>
-  <tr> <td align="right"> 12 </td> <td> en.blogs train </td> <td align="right"> 0.09 </td> <td align="right"> 3.76 </td> <td align="right"> 0.08 </td> <td align="right"> 2.24 </td> <td align="right"> 21.12 </td> </tr>
-  <tr> <td align="right"> 13 </td> <td> en.news cv </td> <td align="right"> 0.45 </td> <td align="right"> 15.43 </td> <td align="right"> 0.15 </td> <td align="right"> 0.99 </td> <td align="right"> 92.13 </td> </tr>
-  <tr> <td align="right"> 14 </td> <td> en.news test </td> <td align="right"> 0.46 </td> <td align="right"> 15.45 </td> <td align="right"> 0.15 </td> <td align="right"> 0.99 </td> <td align="right"> 92.21 </td> </tr>
-  <tr> <td align="right"> 15 </td> <td> en.news train </td> <td align="right"> 0.10 </td> <td align="right"> 3.43 </td> <td align="right"> 0.08 </td> <td align="right"> 2.36 </td> <td align="right"> 20.46 </td> </tr>
-  <tr> <td align="right"> 16 </td> <td> en.twitter cv </td> <td align="right"> 1.06 </td> <td align="right"> 13.66 </td> <td align="right"> 0.19 </td> <td align="right"> 1.42 </td> <td align="right"> 74.17 </td> </tr>
-  <tr> <td align="right"> 17 </td> <td> en.twitter test </td> <td align="right"> 1.06 </td> <td align="right"> 13.64 </td> <td align="right"> 0.19 </td> <td align="right"> 1.42 </td> <td align="right"> 74.07 </td> </tr>
-  <tr> <td align="right"> 18 </td> <td> en.twitter train </td> <td align="right"> 0.24 </td> <td align="right"> 3.04 </td> <td align="right"> 0.08 </td> <td align="right"> 2.77 </td> <td align="right"> 16.51 </td> </tr>
+<!-- Sun Jul 26 12:38:24 2015 -->
+<table border='5px solid black' align='center'>
+<tr> <th> File </th> <th> Lines (mil) </th> <th> Words (mil) </th> <th> Unique (mil) </th> <th> % Unique </th> <th> Bytes (MB) </th>  </tr>
+  <tr> <td> en.blogs cv </td> <td align="right"> 0.40 </td> <td align="right"> 16.75 </td> <td align="right"> 0.17 </td> <td align="right"> 1.03 </td> <td align="right"> 94.07 </td> </tr>
+  <tr> <td> en.blogs test </td> <td align="right"> 0.40 </td> <td align="right"> 16.76 </td> <td align="right"> 0.17 </td> <td align="right"> 1.03 </td> <td align="right"> 94.07 </td> </tr>
+  <tr> <td> en.blogs train </td> <td align="right"> 0.09 </td> <td align="right"> 3.76 </td> <td align="right"> 0.08 </td> <td align="right"> 2.24 </td> <td align="right"> 21.12 </td> </tr>
+  <tr> <td> en.news cv </td> <td align="right"> 0.45 </td> <td align="right"> 15.43 </td> <td align="right"> 0.15 </td> <td align="right"> 0.99 </td> <td align="right"> 92.13 </td> </tr>
+  <tr> <td> en.news test </td> <td align="right"> 0.46 </td> <td align="right"> 15.45 </td> <td align="right"> 0.15 </td> <td align="right"> 0.99 </td> <td align="right"> 92.21 </td> </tr>
+  <tr> <td> en.news train </td> <td align="right"> 0.10 </td> <td align="right"> 3.43 </td> <td align="right"> 0.08 </td> <td align="right"> 2.36 </td> <td align="right"> 20.46 </td> </tr>
+  <tr> <td> en.twitter cv </td> <td align="right"> 1.06 </td> <td align="right"> 13.66 </td> <td align="right"> 0.19 </td> <td align="right"> 1.42 </td> <td align="right"> 74.17 </td> </tr>
+  <tr> <td> en.twitter test </td> <td align="right"> 1.06 </td> <td align="right"> 13.64 </td> <td align="right"> 0.19 </td> <td align="right"> 1.42 </td> <td align="right"> 74.07 </td> </tr>
+  <tr> <td> en.twitter train </td> <td align="right"> 0.24 </td> <td align="right"> 3.04 </td> <td align="right"> 0.08 </td> <td align="right"> 2.77 </td> <td align="right"> 16.51 </td> </tr>
    </table>
 
 ## Data Analysis
@@ -117,629 +111,36 @@ The 1-gram, 2-gram, 3-gram, 4-gram and 5-gram for Blogs, Twitter and News are as
 make_ngrams(train.dir)
 ```
 
-```
-## Warning: internal error -3 in R_decompress1
-```
-
-```
-## Error in eval(expr, envir, enclos): lazy-load database 'c:/projects/edu/ds-capstone/cache/get_dataset_stats_028fbab95108d4afcf84154ec008f22a.rdb' is corrupt
-```
-
 ```r
 freq.en.1grams <<- freq_ngrams(en.1grams, 100, "EN 1-Grams");
 ```
 
-```
-## Warning: internal error -3 in R_decompress1
-```
-
-```
-## Error in eval(expr, envir, enclos): lazy-load database 'c:/projects/edu/ds-capstone/cache/get_dataset_stats_028fbab95108d4afcf84154ec008f22a.rdb' is corrupt
-```
+![plot of chunk get_ngrams](figure/get_ngrams-1.png) 
 
 ```r
 freq.en.2grams <<- freq_ngrams(en.2grams, 100, "EN 2-Grams");
 ```
 
-```
-## Warning: restarting interrupted promise evaluation
-```
-
-```
-## Warning: internal error -3 in R_decompress1
-```
-
-```
-## Error in eval(expr, envir, enclos): lazy-load database 'c:/projects/edu/ds-capstone/cache/get_dataset_stats_028fbab95108d4afcf84154ec008f22a.rdb' is corrupt
-```
+![plot of chunk get_ngrams](figure/get_ngrams-2.png) 
 
 ```r
 freq.en.3grams <<- freq_ngrams(en.3grams, 100, "EN 3-Grams");
 ```
 
-```
-## Warning: restarting interrupted promise evaluation
-```
-
-```
-## Warning: internal error -3 in R_decompress1
-```
-
-```
-## Error in eval(expr, envir, enclos): lazy-load database 'c:/projects/edu/ds-capstone/cache/get_dataset_stats_028fbab95108d4afcf84154ec008f22a.rdb' is corrupt
-```
+![plot of chunk get_ngrams](figure/get_ngrams-3.png) 
 
 ```r
 freq.en.4grams <<- freq_ngrams(en.4grams, 100, "EN 4-Grams");
 ```
 
-```
-## Warning: restarting interrupted promise evaluation
-```
-
-```
-## Warning: internal error -3 in R_decompress1
-```
-
-```
-## Error in eval(expr, envir, enclos): lazy-load database 'c:/projects/edu/ds-capstone/cache/get_dataset_stats_028fbab95108d4afcf84154ec008f22a.rdb' is corrupt
-```
+![plot of chunk get_ngrams](figure/get_ngrams-4.png) 
 
 ```r
 freq.en.5grams <<- freq_ngrams(en.5grams, 100, "EN 5-Grams");
 ```
 
-```
-## Warning: restarting interrupted promise evaluation
-```
+![plot of chunk get_ngrams](figure/get_ngrams-5.png) 
 
-```
-## Warning: internal error -3 in R_decompress1
-```
-
-```
-## Error in eval(expr, envir, enclos): lazy-load database 'c:/projects/edu/ds-capstone/cache/get_dataset_stats_028fbab95108d4afcf84154ec008f22a.rdb' is corrupt
-```
-
-```r
-freq.en.1grams$plot
-```
-
-```
-##         [,1]
-##   [1,]   0.7
-##   [2,]   1.9
-##   [3,]   3.1
-##   [4,]   4.3
-##   [5,]   5.5
-##   [6,]   6.7
-##   [7,]   7.9
-##   [8,]   9.1
-##   [9,]  10.3
-##  [10,]  11.5
-##  [11,]  12.7
-##  [12,]  13.9
-##  [13,]  15.1
-##  [14,]  16.3
-##  [15,]  17.5
-##  [16,]  18.7
-##  [17,]  19.9
-##  [18,]  21.1
-##  [19,]  22.3
-##  [20,]  23.5
-##  [21,]  24.7
-##  [22,]  25.9
-##  [23,]  27.1
-##  [24,]  28.3
-##  [25,]  29.5
-##  [26,]  30.7
-##  [27,]  31.9
-##  [28,]  33.1
-##  [29,]  34.3
-##  [30,]  35.5
-##  [31,]  36.7
-##  [32,]  37.9
-##  [33,]  39.1
-##  [34,]  40.3
-##  [35,]  41.5
-##  [36,]  42.7
-##  [37,]  43.9
-##  [38,]  45.1
-##  [39,]  46.3
-##  [40,]  47.5
-##  [41,]  48.7
-##  [42,]  49.9
-##  [43,]  51.1
-##  [44,]  52.3
-##  [45,]  53.5
-##  [46,]  54.7
-##  [47,]  55.9
-##  [48,]  57.1
-##  [49,]  58.3
-##  [50,]  59.5
-##  [51,]  60.7
-##  [52,]  61.9
-##  [53,]  63.1
-##  [54,]  64.3
-##  [55,]  65.5
-##  [56,]  66.7
-##  [57,]  67.9
-##  [58,]  69.1
-##  [59,]  70.3
-##  [60,]  71.5
-##  [61,]  72.7
-##  [62,]  73.9
-##  [63,]  75.1
-##  [64,]  76.3
-##  [65,]  77.5
-##  [66,]  78.7
-##  [67,]  79.9
-##  [68,]  81.1
-##  [69,]  82.3
-##  [70,]  83.5
-##  [71,]  84.7
-##  [72,]  85.9
-##  [73,]  87.1
-##  [74,]  88.3
-##  [75,]  89.5
-##  [76,]  90.7
-##  [77,]  91.9
-##  [78,]  93.1
-##  [79,]  94.3
-##  [80,]  95.5
-##  [81,]  96.7
-##  [82,]  97.9
-##  [83,]  99.1
-##  [84,] 100.3
-##  [85,] 101.5
-##  [86,] 102.7
-##  [87,] 103.9
-##  [88,] 105.1
-##  [89,] 106.3
-##  [90,] 107.5
-##  [91,] 108.7
-##  [92,] 109.9
-##  [93,] 111.1
-##  [94,] 112.3
-##  [95,] 113.5
-##  [96,] 114.7
-##  [97,] 115.9
-##  [98,] 117.1
-##  [99,] 118.3
-## [100,] 119.5
-```
-
-```r
-freq.en.2grams$plot
-```
-
-```
-##         [,1]
-##   [1,]   0.7
-##   [2,]   1.9
-##   [3,]   3.1
-##   [4,]   4.3
-##   [5,]   5.5
-##   [6,]   6.7
-##   [7,]   7.9
-##   [8,]   9.1
-##   [9,]  10.3
-##  [10,]  11.5
-##  [11,]  12.7
-##  [12,]  13.9
-##  [13,]  15.1
-##  [14,]  16.3
-##  [15,]  17.5
-##  [16,]  18.7
-##  [17,]  19.9
-##  [18,]  21.1
-##  [19,]  22.3
-##  [20,]  23.5
-##  [21,]  24.7
-##  [22,]  25.9
-##  [23,]  27.1
-##  [24,]  28.3
-##  [25,]  29.5
-##  [26,]  30.7
-##  [27,]  31.9
-##  [28,]  33.1
-##  [29,]  34.3
-##  [30,]  35.5
-##  [31,]  36.7
-##  [32,]  37.9
-##  [33,]  39.1
-##  [34,]  40.3
-##  [35,]  41.5
-##  [36,]  42.7
-##  [37,]  43.9
-##  [38,]  45.1
-##  [39,]  46.3
-##  [40,]  47.5
-##  [41,]  48.7
-##  [42,]  49.9
-##  [43,]  51.1
-##  [44,]  52.3
-##  [45,]  53.5
-##  [46,]  54.7
-##  [47,]  55.9
-##  [48,]  57.1
-##  [49,]  58.3
-##  [50,]  59.5
-##  [51,]  60.7
-##  [52,]  61.9
-##  [53,]  63.1
-##  [54,]  64.3
-##  [55,]  65.5
-##  [56,]  66.7
-##  [57,]  67.9
-##  [58,]  69.1
-##  [59,]  70.3
-##  [60,]  71.5
-##  [61,]  72.7
-##  [62,]  73.9
-##  [63,]  75.1
-##  [64,]  76.3
-##  [65,]  77.5
-##  [66,]  78.7
-##  [67,]  79.9
-##  [68,]  81.1
-##  [69,]  82.3
-##  [70,]  83.5
-##  [71,]  84.7
-##  [72,]  85.9
-##  [73,]  87.1
-##  [74,]  88.3
-##  [75,]  89.5
-##  [76,]  90.7
-##  [77,]  91.9
-##  [78,]  93.1
-##  [79,]  94.3
-##  [80,]  95.5
-##  [81,]  96.7
-##  [82,]  97.9
-##  [83,]  99.1
-##  [84,] 100.3
-##  [85,] 101.5
-##  [86,] 102.7
-##  [87,] 103.9
-##  [88,] 105.1
-##  [89,] 106.3
-##  [90,] 107.5
-##  [91,] 108.7
-##  [92,] 109.9
-##  [93,] 111.1
-##  [94,] 112.3
-##  [95,] 113.5
-##  [96,] 114.7
-##  [97,] 115.9
-##  [98,] 117.1
-##  [99,] 118.3
-## [100,] 119.5
-```
-
-```r
-freq.en.3grams$plot
-```
-
-```
-##         [,1]
-##   [1,]   0.7
-##   [2,]   1.9
-##   [3,]   3.1
-##   [4,]   4.3
-##   [5,]   5.5
-##   [6,]   6.7
-##   [7,]   7.9
-##   [8,]   9.1
-##   [9,]  10.3
-##  [10,]  11.5
-##  [11,]  12.7
-##  [12,]  13.9
-##  [13,]  15.1
-##  [14,]  16.3
-##  [15,]  17.5
-##  [16,]  18.7
-##  [17,]  19.9
-##  [18,]  21.1
-##  [19,]  22.3
-##  [20,]  23.5
-##  [21,]  24.7
-##  [22,]  25.9
-##  [23,]  27.1
-##  [24,]  28.3
-##  [25,]  29.5
-##  [26,]  30.7
-##  [27,]  31.9
-##  [28,]  33.1
-##  [29,]  34.3
-##  [30,]  35.5
-##  [31,]  36.7
-##  [32,]  37.9
-##  [33,]  39.1
-##  [34,]  40.3
-##  [35,]  41.5
-##  [36,]  42.7
-##  [37,]  43.9
-##  [38,]  45.1
-##  [39,]  46.3
-##  [40,]  47.5
-##  [41,]  48.7
-##  [42,]  49.9
-##  [43,]  51.1
-##  [44,]  52.3
-##  [45,]  53.5
-##  [46,]  54.7
-##  [47,]  55.9
-##  [48,]  57.1
-##  [49,]  58.3
-##  [50,]  59.5
-##  [51,]  60.7
-##  [52,]  61.9
-##  [53,]  63.1
-##  [54,]  64.3
-##  [55,]  65.5
-##  [56,]  66.7
-##  [57,]  67.9
-##  [58,]  69.1
-##  [59,]  70.3
-##  [60,]  71.5
-##  [61,]  72.7
-##  [62,]  73.9
-##  [63,]  75.1
-##  [64,]  76.3
-##  [65,]  77.5
-##  [66,]  78.7
-##  [67,]  79.9
-##  [68,]  81.1
-##  [69,]  82.3
-##  [70,]  83.5
-##  [71,]  84.7
-##  [72,]  85.9
-##  [73,]  87.1
-##  [74,]  88.3
-##  [75,]  89.5
-##  [76,]  90.7
-##  [77,]  91.9
-##  [78,]  93.1
-##  [79,]  94.3
-##  [80,]  95.5
-##  [81,]  96.7
-##  [82,]  97.9
-##  [83,]  99.1
-##  [84,] 100.3
-##  [85,] 101.5
-##  [86,] 102.7
-##  [87,] 103.9
-##  [88,] 105.1
-##  [89,] 106.3
-##  [90,] 107.5
-##  [91,] 108.7
-##  [92,] 109.9
-##  [93,] 111.1
-##  [94,] 112.3
-##  [95,] 113.5
-##  [96,] 114.7
-##  [97,] 115.9
-##  [98,] 117.1
-##  [99,] 118.3
-## [100,] 119.5
-```
-
-```r
-freq.en.4grams$plot
-```
-
-```
-##         [,1]
-##   [1,]   0.7
-##   [2,]   1.9
-##   [3,]   3.1
-##   [4,]   4.3
-##   [5,]   5.5
-##   [6,]   6.7
-##   [7,]   7.9
-##   [8,]   9.1
-##   [9,]  10.3
-##  [10,]  11.5
-##  [11,]  12.7
-##  [12,]  13.9
-##  [13,]  15.1
-##  [14,]  16.3
-##  [15,]  17.5
-##  [16,]  18.7
-##  [17,]  19.9
-##  [18,]  21.1
-##  [19,]  22.3
-##  [20,]  23.5
-##  [21,]  24.7
-##  [22,]  25.9
-##  [23,]  27.1
-##  [24,]  28.3
-##  [25,]  29.5
-##  [26,]  30.7
-##  [27,]  31.9
-##  [28,]  33.1
-##  [29,]  34.3
-##  [30,]  35.5
-##  [31,]  36.7
-##  [32,]  37.9
-##  [33,]  39.1
-##  [34,]  40.3
-##  [35,]  41.5
-##  [36,]  42.7
-##  [37,]  43.9
-##  [38,]  45.1
-##  [39,]  46.3
-##  [40,]  47.5
-##  [41,]  48.7
-##  [42,]  49.9
-##  [43,]  51.1
-##  [44,]  52.3
-##  [45,]  53.5
-##  [46,]  54.7
-##  [47,]  55.9
-##  [48,]  57.1
-##  [49,]  58.3
-##  [50,]  59.5
-##  [51,]  60.7
-##  [52,]  61.9
-##  [53,]  63.1
-##  [54,]  64.3
-##  [55,]  65.5
-##  [56,]  66.7
-##  [57,]  67.9
-##  [58,]  69.1
-##  [59,]  70.3
-##  [60,]  71.5
-##  [61,]  72.7
-##  [62,]  73.9
-##  [63,]  75.1
-##  [64,]  76.3
-##  [65,]  77.5
-##  [66,]  78.7
-##  [67,]  79.9
-##  [68,]  81.1
-##  [69,]  82.3
-##  [70,]  83.5
-##  [71,]  84.7
-##  [72,]  85.9
-##  [73,]  87.1
-##  [74,]  88.3
-##  [75,]  89.5
-##  [76,]  90.7
-##  [77,]  91.9
-##  [78,]  93.1
-##  [79,]  94.3
-##  [80,]  95.5
-##  [81,]  96.7
-##  [82,]  97.9
-##  [83,]  99.1
-##  [84,] 100.3
-##  [85,] 101.5
-##  [86,] 102.7
-##  [87,] 103.9
-##  [88,] 105.1
-##  [89,] 106.3
-##  [90,] 107.5
-##  [91,] 108.7
-##  [92,] 109.9
-##  [93,] 111.1
-##  [94,] 112.3
-##  [95,] 113.5
-##  [96,] 114.7
-##  [97,] 115.9
-##  [98,] 117.1
-##  [99,] 118.3
-## [100,] 119.5
-```
-
-```r
-freq.en.4grams$plot
-```
-
-```
-##         [,1]
-##   [1,]   0.7
-##   [2,]   1.9
-##   [3,]   3.1
-##   [4,]   4.3
-##   [5,]   5.5
-##   [6,]   6.7
-##   [7,]   7.9
-##   [8,]   9.1
-##   [9,]  10.3
-##  [10,]  11.5
-##  [11,]  12.7
-##  [12,]  13.9
-##  [13,]  15.1
-##  [14,]  16.3
-##  [15,]  17.5
-##  [16,]  18.7
-##  [17,]  19.9
-##  [18,]  21.1
-##  [19,]  22.3
-##  [20,]  23.5
-##  [21,]  24.7
-##  [22,]  25.9
-##  [23,]  27.1
-##  [24,]  28.3
-##  [25,]  29.5
-##  [26,]  30.7
-##  [27,]  31.9
-##  [28,]  33.1
-##  [29,]  34.3
-##  [30,]  35.5
-##  [31,]  36.7
-##  [32,]  37.9
-##  [33,]  39.1
-##  [34,]  40.3
-##  [35,]  41.5
-##  [36,]  42.7
-##  [37,]  43.9
-##  [38,]  45.1
-##  [39,]  46.3
-##  [40,]  47.5
-##  [41,]  48.7
-##  [42,]  49.9
-##  [43,]  51.1
-##  [44,]  52.3
-##  [45,]  53.5
-##  [46,]  54.7
-##  [47,]  55.9
-##  [48,]  57.1
-##  [49,]  58.3
-##  [50,]  59.5
-##  [51,]  60.7
-##  [52,]  61.9
-##  [53,]  63.1
-##  [54,]  64.3
-##  [55,]  65.5
-##  [56,]  66.7
-##  [57,]  67.9
-##  [58,]  69.1
-##  [59,]  70.3
-##  [60,]  71.5
-##  [61,]  72.7
-##  [62,]  73.9
-##  [63,]  75.1
-##  [64,]  76.3
-##  [65,]  77.5
-##  [66,]  78.7
-##  [67,]  79.9
-##  [68,]  81.1
-##  [69,]  82.3
-##  [70,]  83.5
-##  [71,]  84.7
-##  [72,]  85.9
-##  [73,]  87.1
-##  [74,]  88.3
-##  [75,]  89.5
-##  [76,]  90.7
-##  [77,]  91.9
-##  [78,]  93.1
-##  [79,]  94.3
-##  [80,]  95.5
-##  [81,]  96.7
-##  [82,]  97.9
-##  [83,]  99.1
-##  [84,] 100.3
-##  [85,] 101.5
-##  [86,] 102.7
-##  [87,] 103.9
-##  [88,] 105.1
-##  [89,] 106.3
-##  [90,] 107.5
-##  [91,] 108.7
-##  [92,] 109.9
-##  [93,] 111.1
-##  [94,] 112.3
-##  [95,] 113.5
-##  [96,] 114.7
-##  [97,] 115.9
-##  [98,] 117.1
-##  [99,] 118.3
-## [100,] 119.5
-```
 
 
 ## Modeling Strategy
@@ -767,6 +168,7 @@ To reduce the data foot print other NLP smooting methods besides backoff smootin
 
 ### Application Execution
 Since ShinyApps server can only accept limited amount of data, following strategy will be employed:
+
    1. Upload a compressed dictionary of words and indexed N-grams. 
    2. If the data is still larger than what ShinyApps server allows then build a restful interface on Amazon to serve the initialization data.
 
