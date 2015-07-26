@@ -1,7 +1,7 @@
 ---
 title: "Data Science Captsone Milestone Report"
 author: "Shabbir Suterwala"
-date: "Sunday, March 29, 2015"
+date: "Sunday, July 26, 2015"
 output: html_document
 ---
 
@@ -9,17 +9,20 @@ output: html_document
 **Shabbir Suterwala**
 
 ## Executive Summary
-The purpose of this report is to establish an understanding of basic tasks required for data processing of a text corpus. English Blogs, News and Twitter corpora are analyised for word, line and unique word counts. Further more top 1gram, 2grams and 3grams are presented. 
+The purpose of this report is to establish an understanding of basic tasks required for data processing of a text corpus. English Blogs, News and Twitter corpora are analyised for word, line and unique word counts. Furthermore top 1gram, 2grams and 3grams are presented. 
+
+## Code
+The entire source code used to generate this report can be downloaded from https://github.com/shabss/ds-capstone.
 
 ## Data Analysis Level 1
-The data was obtained from the link https://d396qusza40orc.cloudfront.net/dsscapstone/dataset/Coursera-SwiftKey.zip, which is provided by the course instructures. The zip contains copora of blogs, news and twitter in 4 languages English, Dutch, French and Russian. The statistics of the combined corpous is as follows: 
+The data was obtained from the link https://d396qusza40orc.cloudfront.net/dsscapstone/dataset/Coursera-SwiftKey.zip, which is provided by within the course. The zip contains copora of blogs, news and twitter in 4 languages English, Dutch, French and Russian. The statistics of the combined corpous is as follows: 
 
-```{r initialize,echo=TRUE,messages=FALSE}
-source("milestone.R")
+```{r initialize,echo=FALSE,messages=FALSE}
 library(xtable)
 ```
 
-```{r get_dataset_stats,echo=TRUE,messages=FALSE,cache=TRUE}
+```{r get_dataset_stats,echo=TRUE,messages=FALSE}
+source("milestone.R")
 if (!exists("ds.stat")) {
     dss <- get_dataset_stats("Coursera-SwiftKey/final")
     dss$file <- gsub("Coursera-Swiftkey/final/.*/(..)_..(.*).txt", "\\1\\2",
@@ -40,19 +43,20 @@ print(xt, type='html')
 We will primarily work with English dataset. Working with full English dataset took long time for the desktop computer. So we decided to break the data into a smaller set for this report: 
 
 ```{r breakdown_info,echo=TRUE}
-breakdown = list(train=60, cv=20, test=20)
+breakdown <- list(train=60, cv=20, test=20)
+report.breakdown <- list(train=10, cv=45, test=45)
 xt <- xtable(data.frame(Type=c("Training %", "CV %", "Test %"),
-                        Project=unlist(breakdown), Report=c(5, NA, NA)))
+                        Project=unlist(breakdown), 
+                        Report=unlist(report.breakdown)))
 ```
 ```{r display_breakdown_info,echo=FALSE,results='asis'}
 print(xt, type='html')
 ```
 
 Thus the English training data for this report looks as follows:
-```{r get_dataset,echo=TRUE,cache=TRUE}
-
-train.dir <- sprintf("data.%02d", breakdown$train)
-ds <- get_dataset(train.dir, breakdown)
+```{r get_dataset,echo=TRUE}
+train.dir <- sprintf("data.%02d", report.breakdown$train)
+ds <- get_dataset(train.dir, report.breakdown)
 
 if (!exists("ds.prep.stat")) {
     dps <- get_dataset_stats(train.dir)
@@ -72,30 +76,40 @@ print(xt, type='html')
 
 ## Data Analysis
 
-The 1-gram, 2-gram and 3-gram for Blogs, Twitter and News are as follows:
-```{r make_ngrams,echo=TRUE,cache=TRUE}
+The 1-gram, 2-gram, 3-gram, 4-gram and 5-gram for Blogs, Twitter and News are as follows:
+```{r make_ngrams,echo=TRUE}
 make_ngrams(train.dir)
+
+```
+```{r get_ngrams,echo=TRUE,fig.height=20}
+freq.en.1grams <<- freq_ngrams(en.1grams, 100, "EN 1-Grams");
+freq.en.2grams <<- freq_ngrams(en.2grams, 100, "EN 2-Grams");
+freq.en.3grams <<- freq_ngrams(en.3grams, 100, "EN 3-Grams");
+freq.en.4grams <<- freq_ngrams(en.4grams, 100, "EN 4-Grams");
+freq.en.5grams <<- freq_ngrams(en.5grams, 100, "EN 5-Grams");
 ```
 ```{r show_ngrams,echo=TRUE,fig.height=20}
-(freq.en.1grams <<- freq_ngrams(en.1grams, 100, "EN 1-Grams"))$plot
-(freq.en.2grams <<- freq_ngrams(en.2grams, 100, "EN 2-Grams"))$plot
-(freq.en.3grams <<- freq_ngrams(en.3grams, 100, "EN 3-Grams"))$plot
-(freq.en.4grams <<- freq_ngrams(en.4grams, 100, "EN 4-Grams"))$plot
-(freq.en.5grams <<- freq_ngrams(en.5grams, 100, "EN 5-Grams"))$plot
-
+#freq.en.1grams$plot
+#freq.en.2grams$plot
+#freq.en.3grams$plot
+#freq.en.4grams$plot
+#freq.en.4grams$plot
 ```
 
 
 ## Modeling Strategy
 
-To buld the prediction model following tasks has to be further performed
+To build the prediction model following tasks has to be further performed
 
-   1. Use porter stemming to improve N-gram frequencies. This will help reduce data footprint of the model
-   2. Use PCFG to understand the sentense structure. This will help with predicting the right POS
-   3. Once probable words are found with combining porter stemming and PCFG, Use backoff strategy to predict probability of a given word.
+   1. Use porter stemming to improve N-gram frequencies. This will help reduce data footprint of the model. Build up N-gram models and evaluate performance of each until a reasonable accuracy is met. 
+   2. Use PCFG to understand the sentence structure. This will help with predicting the right POS. Since our model will be based on stemmed documents, this will help with not only predicting the right word it will also help selecting the right stop words and, in particular, the conjunctions.  
+   3. Once probable words are found with combining porter stemming and PCFG, Use backoff strategy to predict probability of a given word. Have two strategies to predict 1) the words and 2) stop words and conjunctions. 
+   4. Only use frequently used words - the exact balance will be determined during training and CV. This will assist with reducing the overfit and reduce the data footprint required for execution.
+   5. Create a dictionary of words. Use indexes into this dictionary to build N-gram models. This will help with both compression and  fast lookups.
    
 ## Logistic Strategy
 
+### Training 
 Given the resource requirements for the tm package we will break the training data into multiple pieces and distribute this on multiple machines. Too keep things simple file system will be used as data sharing mechanism. 
 
    1. Training dataset will equally split into 10 parts. This can easily be done with Linux/Unix utilities.
@@ -104,8 +118,13 @@ Given the resource requirements for the tm package we will break the training da
       2. Creating a merged model from individual models
    3. One master computer will issue the tasks. The master will will also execute tasks.
 
-To reduce the data foot print other NLP smooting methods besides backoff smooting will be analzed and best will be picked
-   
+To reduce the data foot print other NLP smooting methods besides backoff smooting will be analzed and best will be picked.
+
+### Application Execution
+Since ShinyApps server can only accept limited amount of data, following strategy will be employed:
+   1. Upload a compressed dictionary of words and indexed N-grams. 
+   2. If the data is still larger than what ShinyApps server allows then build a restful interface on Amazon to serve the initialization data.
+
 # Conclusion
 English Blogs, News and Twitter corpora are analyised for word, line and unique word counts and corresponding 1gram, 2grams and 3grams are presented. Additionally, strategies for building a machine learning model to predict the next word is provided.
 

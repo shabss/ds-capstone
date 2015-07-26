@@ -3,6 +3,12 @@ library(tm)
 library(slam)
 library(stringi)
 
+sysname <- toupper(system("uname -n", intern=TRUE))
+if (sysname == "USMONSSUTERWA01") {
+    Sys.setenv(JAVA_HOME='c:\\jre7_x64')
+    options( java.parameters = "-Xmx24g" )
+}
+
 dataset.recurse <- function (indir, outdir, func, param) {
     files <- list.files(indir);
     for (file in files) {
@@ -162,26 +168,50 @@ get_dataset <- function(outdir, breakdown) {
 
 #profanity obtained from https://gist.github.com/ryanlewis/a37739d710ccdb4b406d
 
-preProcessCorpus <- function(dir, pattern) {
-    p1 <- proc.time()
+
+preProcessCorpusSource <- function(corpSrc, rdCtrl=NULL, rm.stop=TRUE) {
+    
+    if (is.null(rdCtrl)) {
+        rdCtrl <- list(reader=readPlain,
+                       language="en", #hardcode for now
+                       load=TRUE)
+    }
+    
+    corp <- Corpus(corpSrc, readerControl = rdCtrl)
     if (!exists("profanity")) {
         profanity <<- readLines("profanity.txt", warn=FALSE, skipNul=TRUE)
     }
+    
+    doc.ids <- rownames(summary(corp))
+    #print(doc.ids)
+    corp <- tm_map(corp, content_transformer(tolower))
+    corp <- tm_map(corp, PlainTextDocument)
+    corp <- tm_map(corp, content_transformer(removePunctuation))
+    if (rm.stop == TRUE) {
+        corp <- tm_map(corp, removeWords, c(stopwords("english"), profanity))
+    }
+    corp <- tm_map(corp, content_transformer(removeNumbers))    
+    corp <- tm_map(corp, stripWhitespace)
+    corp <- tm_map(corp, stemDocument)
+    for (i in 1:length(corp)) {
+        corp[[i]]$meta$id <- doc.ids[i]
+    }
+    #print (summary(corp))
+    corp
+}
+
+preProcessCorpusDir <- function(dir, pattern) {
+    p1 <- proc.time()
     #dat <- readLines(file)
     if (is.null(pattern)) {
         pattern = "*"
     }
-    corp <- Corpus(DirSource(dir, pattern=pattern), 
-                   readerControl = list(reader=readPlain,
-                                        language="en", #hardcode for now 
-                                        load=TRUE))
-    
-    corp <- tm_map(corp, content_transformer(tolower))
-    corp <- tm_map(corp, content_transformer(removePunctuation))
-    corp <- tm_map(corp, stripWhitespace)
-    corp <- tm_map(corp, removeWords, c(stopwords("english"), profanity))
-    corp <- tm_map(corp, content_transformer(removeNumbers))
-    corp <- tm_map(corp, PlainTextDocument)
+    dirSource <- DirSource(dir, pattern=pattern)
+    readerControl <- list(reader=readPlain,
+                          language="en", #hardcode for now
+                          load=TRUE)
+
+    corp <- preProcessCorpusSource(dirSource, readerControl)
 }
 
 make_ngram_table <- function (corp, ngram) {
@@ -190,8 +220,8 @@ make_ngram_table <- function (corp, ngram) {
 }
 
 make_ngrams <- function(dir) {
-    if (!file.exists(dir)) get_dataset(dir, breakdown=list(train=0.10, cv=.45, test=.45))
-    if (!exists("en.corp")) en.corp <<- preProcessCorpus(paste0(dir,"/en_US/"), "*.train")
+    if (!file.exists(dir)) get_dataset(dir, breakdown=list(train=10, cv=45, test=45))
+    if (!exists("en.corp")) en.corp <<- preProcessCorpusDir(paste0(dir,"/en_US/"), "*.train")
     if (!exists("en.1grams")) en.1grams <<- make_ngram_table(en.corp, 1)
     if (!exists("en.2grams")) en.2grams <<- make_ngram_table(en.corp, 2)
     if (!exists("en.3grams")) en.3grams <<- make_ngram_table(en.corp, 3)
@@ -228,6 +258,121 @@ freq_ngrams <- function(tdm, limit, title) {
     }
     f <- list(freq=freq, plot = bp);
     par(mar=mar.old)
+    return(f)
 }
 
+prepareCleanedCorpus <- function(indir, outdir) {
+    corp <- preProcessCorpusDir(indir, "*.txt")
+    if (!file.exists(outdir)) {
+        dir.create(outdir)
+    }
+    writeCorpus(corp, path = outdir)
+    corp
+}
+
+doCleanCorpus <- function() {
+    corp <- prepareCleanedCorpus("Coursera-SwiftKey/final/en_US/", "./data.cleaned")
+}
+
+
+predictQuiz3 <- function(mainCorp, cleanedDir) {
+    
+    dd<-data.frame(
+        id=1:10,
+        text=c("The guy in front of me just bought a pound of bacon, a bouquet, and a case of",
+               "You're the reason why I smile everyday. Can you follow me please? It would mean the",
+               "Hey sunshine, can you follow me and make me the",
+               "Very early observations on the Bills game: Offense still struggling but the",
+               "Go on a romantic date at the",
+               "Well I'm pretty sure my granny has some old bagpipes in her garage I'll dust them off and be on my",
+               "Ohhhhh #PointBreak is on tomorrow. Love that film and haven't seen it in quite some",
+               "After the ice bucket challenge Louis will push his long wet hair out of his eyes with his little",
+               "Be grateful for the good times and keep the faith during the",
+               "If this isn't the cutest thing you've ever seen, then you must be")
+        ,stringsAsFactors=F
+    )
+    dd.choices=matrix(
+        c("cheese",    "beer",        "pretzels", "soda",
+          "world",     "most",        "best",     "universe",
+          "happiest",  "bluest",      "saddest",  "smelliest",
+          "players",   "crowd",       "defense",  "referees",
+          "mall",      "movies",      "grocery",  "beach",
+          "motorcycle","phone",       "way",      "horse",
+          "weeks",     "years",       "thing",    "time",
+          "fingers",   "toes",        "ears",     "eyes",
+          "worse",     "sad",         "bad",      "hard",
+          "callous",   "insensitive", "asleep",   "insane"),
+        ncol=4, byrow=TRUE)
+    
+    rdCtrl <- list(reader = readTabular(mapping=list(content="text", id="id")))
+    
+    dd.choices <- paste(dd.choices, collapse=" ")
+    #print(dd.choices)
+    #dd.choices <- matrix(strsplit(dd.choices, " ")[[1]], ncol=4, byrow=FALSE)
+    dfChoices <- DataframeSource(data.frame(id = 1, text=dd.choices, stringsAsFactors=F))
+    dfChoicesCorp <- preProcessCorpusSource(dfChoices, rdCtrl, rm.stop=FALSE)
+    #print(dfChoicesCorp[[1]]$content)
+    dd.choices <- matrix(strsplit(dfChoicesCorp[[1]]$content, " ")[[1]], ncol=4, byrow=FALSE)
+    #print(dd.choices)
+    
+    dfSource <- DataframeSource(dd)
+    rdCtrl <- list(reader = readTabular(mapping=list(content="text", id="id")))
+    corp <- preProcessCorpusSource(dfSource, rdCtrl)
+    
+    df4w <- sapply(1:length(corp), function(x) {
+        spl <- strsplit(corp[[x]]$content, " ")[[1]]
+        n <- length(spl)
+        w0 <- spl[n]
+        w1 <- spl[n-1]
+        w2 <- spl[n-2]
+        w3 <- spl[n-3]
+        #print(paste(w0,w1,w2,w3))        
+        list(w0 = w0, w1 = w1, w2 = w2, w3 = w3)
+    })
+    df4w <- t(df4w)
+    #print(df4w)
+    
+    #run the following command with w0
+    #grep -oh "w0 [a-z]\+" *.txt | sort | uniq -c | sort
+
+    for (i in 1:nrow(df4w)) {
+        
+        #cmd <- paste("grep -oh \"", df4w[i,]$w0," [a-z]+\" ", 
+        #             cleanedDir, "/*.txt | sort | uniq -c | sort -n",
+        #             sep="")
+        
+        cmd <- paste("get_next_word", df4w[i,]$w0, cleanedDir)
+        #print(cmd)                 
+        sysout <- system(cmd, intern=TRUE)
+        #print(sysout)
+        sysout <- gsub("(\\d+) \\w+ (\\w+)", "\\1,\\2", sysout, perl=TRUE, ignore.case=TRUE)
+        con <- textConnection(sysout)
+        sysout <- read.csv(con, header=FALSE, col.names=c("count", "words"))
+        #print(tail(sysout))
+        
+        choices <- dd.choices[i,]
+        print(corp[[i]]$content)
+        print(choices)
+        print(sysout[sysout$words %in% choices,])
+        close(con)
+    }
+    
+    #wordHits <- sapply(1:nrow(df4w), function(x) {
+    #    w0 <- df4w[x,1]
+    #    words <- c()
+    #    for (i in 1:length(mainCorp)) {
+    #        pattern <- paste0(w0, " (\\w+) .*")
+    #        print(paste0("'", pattern, "'"))
+    #        ws <- gsub(pattern, "\\1", mainCorp[[i]]$content, perl=TRUE)
+    #        if ((i == 1) && (x == 1)) {
+    #            print(ws)
+    #            #cat("w0=", w0, ", words=", as.vector(ws))
+    #        }
+    #        words <- c(words, ws)
+    #    }
+    #    #print(words)
+    #    list(w0 = w0, hits = words)
+    #})
+    #wordHits <- t(wordHits)
+}
 
